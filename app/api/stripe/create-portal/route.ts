@@ -1,5 +1,5 @@
 import type { NextRequest } from "next/server"
-import { stripe } from "@/lib/stripe-server";
+import stripe from "@/lib/stripe-server";
 import { getUserFromRequest } from "@/lib/jwt"
 import { UserModel } from "@/lib/models/user"
 
