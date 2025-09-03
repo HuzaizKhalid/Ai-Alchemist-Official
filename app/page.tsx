@@ -1,0 +1,173 @@
+"use client";
+
+import type React from "react";
+import { useState, useRef, useEffect } from "react";
+import Script from "next/script";
+import { AuthModal } from "@/components/auth-modal";
+import { useAuth } from "@/hooks/use-auth";
+import SearchForm from "@/components/SearchForm";
+import Background from "@/components/Background";
+import { Spotlight } from "@/components/ui/spotlight-new";
+import { addHistory } from "@/lib/historyClient";
+import { useSearch } from "@/context/searchContext";
+import HowItWorksTimeline from "@/components/assistant-ui/TimeLine";
+import Footer from "@/components/footer";
+import { SearchResults } from "@/components/search-results";
+import ConversationHistory from "@/components/ConversationHistory";
+import { toast } from "sonner";
+
+type SearchMode = "new" | "followup";
+
+export default function HomePage() {
+  const [query, setQuery] = useState("");
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [searchResults, setSearchResults] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [searchMode, setSearchMode] = useState<SearchMode>("new");
+  const { user } = useAuth();
+  const { setSearchActive, isSearchActive } = useSearch();
+  const inputRef = useRef<HTMLTextAreaElement | null>(null);
+
+  const handleSearch = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user) {
+      setShowAuthModal(true);
+      return;
+    }
+    if (!query.trim()) return;
+    setIsLoading(true);
+    try {
+      const response = await fetch("/api/search", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query }),
+      });
+      if (!response.ok)
+        throw new Error(`HTTP error! status: ${response.status}`);
+      const data = await response.json();
+      await addHistory({ ...data, userId: user.id });
+      setSearchActive(true);
+      setSearchMode("new");
+      toast.success("Search successful!");
+      setSearchResults(data);
+    } catch (error) {
+      toast.error("Search failed. Please try again.");
+      console.error("Search failed:", error);
+    } finally {
+      setIsLoading(false);
+      setQuery("");
+    }
+  };
+
+  const handleSearchModeChange = (mode: SearchMode) => {
+    setSearchMode(mode);
+    if (mode === "followup") {
+      setSearchActive(true);
+    }
+  };
+
+  const handleNewSearch = () => {
+    setSearchMode("new");
+    setSearchResults(null);
+    setQuery("");
+    setSearchActive(false);
+    setTimeout(() => inputRef.current?.focus(), 0);
+  };
+
+  // ⏰ Climate Clock Injection
+  useEffect(() => {
+    const container = document.getElementById("climate-clock-container");
+    if (container && !container.querySelector("climate-clock")) {
+      const el = document.createElement("climate-clock");
+      container.appendChild(el);
+    }
+  }, []);
+
+  return (
+    <div className="bg-slate-900 text-slate-50">
+      <div className="relative min-h-screen flex flex-col pt-40 ">
+        <Spotlight />
+
+        <main className="flex-1 flex flex-col justify-center overflow-y-auto pt-12">
+          {!isSearchActive ? (
+            <div className="w-full max-w-4xl mx-auto px-6 text-center">
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-50 mb-6 leading-tight tracking-tight drop-shadow-md">
+                What do you want to know{" "}
+                <span className="bg-gradient-to-r from-cyan-300 to-violet-400 bg-clip-text text-transparent">
+                  sustainably
+                </span>
+                ?
+              </h1>
+
+              <div className="relative max-w-3xl mx-auto rounded-3xl p-[1px] bg-gradient-to-r mb-16 from-cyan-400/20 to-violet-400/20">
+                <div className="rounded-[23px] p-6 backdrop-blur-lg bg-slate-800/80">
+                  <p className="text-base lg:text-lg text-slate-100 leading-relaxed font-normal">
+                    Get AI-powered answers while tracking the environmental
+                    impact of your queries! Set daily limits and discover the
+                    most energy-efficient models for your needs.
+                  </p>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="w-full mx-auto my-12 mt-16 md:mt-28">
+              {searchMode === "followup" ? (
+                <ConversationHistory onNewSearch={handleNewSearch} />
+              ) : (
+                <div className="w-full mx-auto px-6 lg:px-8">
+                  <div className="backdrop-blur-lg">
+                    <SearchResults
+                      isHome={true}
+                      results={searchResults}
+                      onNewSearch={handleNewSearch}
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </main>
+
+        {/* Sticky Search Bar */}
+        <div className="sticky bottom-0 bg-slate-900/60 backdrop-blur-md border-t border-slate-700/50">
+          <div className="h-px bg-gradient-to-r from-transparent via-slate-600/40 to-transparent" />
+          <div className="max-w-4xl mx-auto p-4 sm:p-6">
+            <SearchForm
+              query={query}
+              setQuery={setQuery}
+              handleSearch={handleSearch}
+              isLoading={isLoading}
+              inputRef={inputRef}
+              onSearchModeChange={handleSearchModeChange}
+            />
+            <div className="mt-3 px-2">
+              <p className="text-xs text-slate-400 text-center leading-relaxed">
+                AI responses may contain inaccuracies. Please verify important
+                information. Your queries are processed to improve our service
+                and track environmental impact.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Timeline + Footer */}
+      <div className="">
+        <HowItWorksTimeline />
+        <Footer />
+      </div>
+
+      {/* Climate Clock Script */}
+      <Script
+        src="https://climateclock.world/widget-v2.js"
+        strategy="lazyOnload"
+      />
+
+      {/* Auth Modal */}
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+      />
+    </div>
+  );
+}
