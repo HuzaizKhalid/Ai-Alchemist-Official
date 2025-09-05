@@ -4,6 +4,7 @@ import type React from "react";
 import { useState, useRef, useEffect } from "react";
 import Script from "next/script";
 import { AuthModal } from "@/components/auth-modal";
+import { AuthDebugger } from "@/components/auth-debugger";
 import { useAuth } from "@/hooks/use-auth";
 import SearchForm from "@/components/SearchForm";
 import Background from "@/components/Background";
@@ -168,6 +169,9 @@ export default function HomePage() {
         isOpen={showAuthModal}
         onClose={() => setShowAuthModal(false)}
       />
+      
+      {/* Auth Debugger - Remove in production */}
+      <AuthDebugger />
     </div>
   );
 }
