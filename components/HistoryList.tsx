@@ -397,20 +397,25 @@ const HistoryList: React.FC<HistoryListProps> = ({
                 {expandedItems.has(pageIndex) && (
                   <div className="border-t border-white/10">
                     <div className="p-4 sm:p-6">
-                      <SearchResults 
+                      <SearchResults
                         results={{
                           query: item.query,
                           response: item.response,
                           environmental: {
                             energyUsage: item.environmental?.energyUsage || 0,
-                            carbonEmissions: item.environmental?.carbonEmissions || 0,
+                            carbonEmissions:
+                              item.environmental?.carbonEmissions || 0,
                             waterUsage: item.environmental?.waterUsage || 0,
-                            efficiency: (item.environmental?.efficiency as "low" | "medium" | "high") || "medium",
-                            tokenCount: item.environmental?.tokenCount || 0
+                            efficiency:
+                              (item.environmental?.efficiency as
+                                | "low"
+                                | "medium"
+                                | "high") || "medium",
+                            tokenCount: item.environmental?.tokenCount || 0,
                           },
-                          tokenUsage: item.tokenUsage
-                        }} 
-                        onNewSearch={onNewSearch} 
+                          tokenUsage: item.tokenUsage,
+                        }}
+                        onNewSearch={onNewSearch}
                       />
                     </div>
                   </div>

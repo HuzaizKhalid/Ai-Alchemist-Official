@@ -52,7 +52,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.className} relative min-h-screen`} suppressHydrationWarning>
+      <body
+        className={`${inter.className} relative min-h-screen`}
+        suppressHydrationWarning
+      >
         <ClientLayout>
           <ThemeProvider attribute="class" defaultTheme="dark">
             <div
