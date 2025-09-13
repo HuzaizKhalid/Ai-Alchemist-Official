@@ -4,20 +4,20 @@ import { getDatabase } from "@/lib/mongodb";
 export async function GET(request: NextRequest) {
   try {
     console.log("🔍 Testing MongoDB connection...");
-    
+
     // Test the database connection
     const db = await getDatabase();
-    
+
     // Try to ping the database
     await db.admin().ping();
-    
+
     // Get database stats
     const stats = await db.stats();
-    
+
     console.log("✅ MongoDB connection successful!");
     console.log(`📊 Database: ${db.databaseName}`);
     console.log(`📄 Collections: ${stats.collections}`);
-    
+
     return NextResponse.json({
       success: true,
       message: "MongoDB connection successful",
@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error("❌ MongoDB connection failed:", error);
-    
+
     return NextResponse.json(
       {
         success: false,

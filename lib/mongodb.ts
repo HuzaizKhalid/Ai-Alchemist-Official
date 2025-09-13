@@ -28,13 +28,16 @@ if (process.env.NODE_ENV === "development") {
   if (!globalWithMongo._mongoClientPromise) {
     console.log("🆕 Creating new MongoDB connection...");
     client = new MongoClient(uri, options);
-    globalWithMongo._mongoClientPromise = client.connect().then((client) => {
-      console.log("✅ MongoDB connected successfully in development mode!");
-      return client;
-    }).catch((error) => {
-      console.error("❌ MongoDB connection failed:", error.message);
-      throw error;
-    });
+    globalWithMongo._mongoClientPromise = client
+      .connect()
+      .then((client) => {
+        console.log("✅ MongoDB connected successfully in development mode!");
+        return client;
+      })
+      .catch((error) => {
+        console.error("❌ MongoDB connection failed:", error.message);
+        throw error;
+      });
   } else {
     console.log("🔄 Reusing existing MongoDB connection...");
   }
@@ -42,13 +45,16 @@ if (process.env.NODE_ENV === "development") {
 } else {
   console.log("🚀 Setting up MongoDB connection for production...");
   client = new MongoClient(uri, options);
-  clientPromise = client.connect().then((client) => {
-    console.log("✅ MongoDB connected successfully in production mode!");
-    return client;
-  }).catch((error) => {
-    console.error("❌ MongoDB connection failed:", error.message);
-    throw error;
-  });
+  clientPromise = client
+    .connect()
+    .then((client) => {
+      console.log("✅ MongoDB connected successfully in production mode!");
+      return client;
+    })
+    .catch((error) => {
+      console.error("❌ MongoDB connection failed:", error.message);
+      throw error;
+    });
 }
 
 export async function getDatabase(): Promise<Db> {

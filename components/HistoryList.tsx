@@ -1,6 +1,7 @@
 "use client";
 
 import { useAuth } from "@/hooks/use-auth";
+import { useWindowSize } from "@/hooks/use-client";
 import { getHistory } from "@/lib/historyClient";
 import React from "react";
 import { SearchResults } from "./search-results";
@@ -31,11 +32,22 @@ import {
 interface HistoryItem {
   id?: string | number;
   query: string;
+  response: string; // Added response field
   createdAt?: string | number;
   timestamp?: string | number;
   environmental?: {
     efficiency?: "high" | "medium" | "low";
     tokenCount?: number;
+    energyUsage?: number;
+    carbonEmissions?: number;
+    waterUsage?: number;
+  };
+  tokenUsage?: {
+    inputTokens: number;
+    outputTokens: number;
+    totalTokens: number;
+    reasoningTokens: number;
+    cachedInputTokens: number;
   };
 }
 
@@ -133,11 +145,11 @@ const HistoryList: React.FC<HistoryListProps> = ({
   const goToNextPage = () => goToPage(currentPage + 1);
 
   // Fetch whenever userId or external isLoading flag changes
-  // React.useEffect(() => {
-  //   if (userId) {
-  //     fetchHistory();
-  //   }
-  // }, [userId, isLoading]);
+  React.useEffect(() => {
+    if (userId) {
+      fetchHistory();
+    }
+  }, [userId, isLoading]);
 
   // Scroll into view whenever currentItems or the expandedItems set changes
   // React.useEffect(() => {
@@ -208,9 +220,9 @@ const HistoryList: React.FC<HistoryListProps> = ({
     return pages;
   };
 
-  // Safe window width check
-  const isMobile =
-    typeof window !== "undefined" ? window.innerWidth < 640 : false;
+  // Use window size hook to determine mobile view safely
+  const { width } = useWindowSize();
+  const isMobile = width < 640;
 
   return (
     <div className="mx-auto container space-y-4 sm:space-y-6 px-4 sm:px-6">
@@ -385,7 +397,21 @@ const HistoryList: React.FC<HistoryListProps> = ({
                 {expandedItems.has(pageIndex) && (
                   <div className="border-t border-white/10">
                     <div className="p-4 sm:p-6">
-                      <SearchResults results={item} onNewSearch={onNewSearch} />
+                      <SearchResults 
+                        results={{
+                          query: item.query,
+                          response: item.response,
+                          environmental: {
+                            energyUsage: item.environmental?.energyUsage || 0,
+                            carbonEmissions: item.environmental?.carbonEmissions || 0,
+                            waterUsage: item.environmental?.waterUsage || 0,
+                            efficiency: (item.environmental?.efficiency as "low" | "medium" | "high") || "medium",
+                            tokenCount: item.environmental?.tokenCount || 0
+                          },
+                          tokenUsage: item.tokenUsage
+                        }} 
+                        onNewSearch={onNewSearch} 
+                      />
                     </div>
                   </div>
                 )}

@@ -46,7 +46,10 @@ export class HistoryModel {
   static async findByUserId(userId: string): Promise<History[]> {
     const db = await getDatabase();
     const histories = db.collection<History>("histories");
-    return await histories.find({ userId: new ObjectId(userId) }).toArray();
+    return await histories
+      .find({ userId: new ObjectId(userId) })
+      .sort({ createdAt: -1 }) // Sort by creation date, newest first
+      .toArray();
   }
 
   static async deleteByUserId(userId: string): Promise<void> {
