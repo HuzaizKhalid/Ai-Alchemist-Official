@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Dynamic Suggestions</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; }
+        input { width: 100%; padding: 10px; font-size: 16px; border: 1px solid #ccc; border-radius: 5px; }
+        .suggestions { margin-top: 10px; border: 1px solid #ddd; border-radius: 5px; }
+        .suggestion { padding: 10px; cursor: pointer; border-bottom: 1px solid #eee; }
+        .suggestion:hover { background: #f5f5f5; }
+        .suggestion:last-child { border-bottom: none; }
+    </style>
+</head>
+<body>
+    <h1>Test Dynamic Search Suggestions</h1>
+    <p>Type partial queries like "who is the founder of", "what is", "how to", etc.</p>
+    
+    <input type="text" id="searchInput" placeholder="Start typing..." />
+    <div id="suggestions" class="suggestions" style="display: none;"></div>
+    <div id="debugInfo"></div>
+
+    <script>
+        const searchInput = document.getElementById('searchInput');
+        const suggestionsDiv = document.getElementById('suggestions');
+        let debounceTimer;
+
+        searchInput.addEventListener('input', function() {
+            clearTimeout(debounceTimer);
+            const query = this.value.trim();
+            
+            if (query.length < 1) {
+                suggestionsDiv.style.display = 'none';
+                return;
+            }
+
+            debounceTimer = setTimeout(() => {
+                fetchSuggestions(query);
+            }, 300);
+        });
+
+        async function fetchSuggestions(query) {
+            try {
+                console.log('Fetching suggestions for:', query);
+                const response = await fetch(`/api/search/suggestions?q=${encodeURIComponent(query)}&limit=8`);
+                const data = await response.json();
+                
+                console.log('API Response:', data);
+                
+                if (data.suggestions && data.suggestions.length > 0) {
+                    displaySuggestions(data.suggestions);
+                    document.getElementById('debugInfo').innerHTML = `
+                        <div style="background: #f0f9ff; padding: 10px; margin: 10px 0; border-radius: 5px; font-size: 12px;">
+                            <strong>Debug Info:</strong><br>
+                            Query: "${data.query}"<br>
+                            Source: ${data.source}<br>
+                            Count: ${data.count}<br>
+                            API Response Time: ${new Date(data.timestamp).toLocaleTimeString()}<br>
+                            Suggestions: ${JSON.stringify(data.suggestions)}
+                        </div>
+                    `;
+                } else {
+                    suggestionsDiv.style.display = 'none';
+                    document.getElementById('debugInfo').innerHTML = '<div style="color: red;">No suggestions received</div>';
+                }
+            } catch (error) {
+                console.error('Error fetching suggestions:', error);
+                suggestionsDiv.style.display = 'none';
+                document.getElementById('debugInfo').innerHTML = `<div style="color: red;">Error: ${error.message}</div>`;
+            }
+        }
+
+        function displaySuggestions(suggestions) {
+            suggestionsDiv.innerHTML = '';
+            suggestions.forEach(suggestion => {
+                const div = document.createElement('div');
+                div.className = 'suggestion';
+                div.textContent = suggestion;
+                div.addEventListener('click', () => {
+                    searchInput.value = suggestion;
+                    suggestionsDiv.style.display = 'none';
+                });
+                suggestionsDiv.appendChild(div);
+            });
+            suggestionsDiv.style.display = 'block';
+        }
+    </script>
+</body>
+</html>

@@ -31,10 +31,14 @@ import {
   MessageCircle,
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
+import { useSearchSuggestions } from "@/hooks/use-search-suggestions";
+import { useRecentGlobalHistory } from "@/hooks/use-recent-global-history";
 import { getHistory } from "@/lib/historyClient";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { SearchResults } from "@/components/search-results";
+import SearchSuggestions from "@/components/SearchSuggestions";
+import RecentHistory from "@/components/RecentHistory";
 
 interface SearchFormProps {
   className?: string;
@@ -86,6 +90,66 @@ const SearchForm = ({
   const [expandedItems, setExpandedItems] = useState<Set<number>>(new Set());
   const [selectedHistoryItem, setSelectedHistoryItem] =
     useState<HistoryItem | null>(null);
+  
+  // Search suggestions state
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [showRecentHistory, setShowRecentHistory] = useState(false);
+  const suggestionCategory = selectedType === "text" ? "sustainability" : "";
+  
+  const {
+    suggestions,
+    isLoading: isLoadingSuggestions,
+    error: suggestionsError,
+    selectedIndex,
+    setSelectedIndex,
+    clearSuggestions,
+    selectSuggestion
+  } = useSearchSuggestions(query, {
+    debounceMs: 300,
+    minQueryLength: 1,
+    maxSuggestions: 8,
+    category: suggestionCategory
+  });
+
+  // Recent global history state
+  const {
+    history: recentHistory,
+    isLoading: isLoadingRecentHistory,
+    error: recentHistoryError,
+    hasHistory
+  } = useRecentGlobalHistory(5);
+
+  // Auto-show suggestions when they're available and input is focused
+  useEffect(() => {
+    console.log('Suggestions state:', { 
+      suggestions: suggestions.length, 
+      isFocused, 
+      queryLength: query.length, 
+      isLoading: isLoadingSuggestions,
+      showSuggestions 
+    });
+    
+    // Show recent history when focused but no query, show suggestions when typing
+    if (isFocused) {
+      if (query.length === 0) {
+        // Show recent history when just focused (no typing)
+        setShowRecentHistory(true);
+        setShowSuggestions(false);
+      } else if (query.length > 0 && suggestions.length > 0) {
+        // Show suggestions when typing
+        setShowRecentHistory(false);
+        setShowSuggestions(true);
+      } else if (query.length > 0 && suggestions.length === 0 && !isLoadingSuggestions) {
+        // Hide both when typing but no suggestions
+        setShowRecentHistory(false);
+        setShowSuggestions(false);
+      }
+    } else {
+      // Hide both when not focused
+      setShowRecentHistory(false);
+      setShowSuggestions(false);
+    }
+  }, [suggestions, isFocused, query.length, isLoadingSuggestions, showSuggestions]);
 
   const searchTypes: SearchTypeOption[] = [
     {
@@ -148,9 +212,93 @@ const SearchForm = ({
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      handleSearch(e as unknown as React.FormEvent);
+    // Handle suggestions navigation
+    if (showSuggestions && suggestions.length > 0) {
+      switch (e.key) {
+        case 'ArrowDown':
+          e.preventDefault();
+          setSelectedIndex(Math.min(selectedIndex + 1, suggestions.length - 1));
+          break;
+        case 'ArrowUp':
+          e.preventDefault();
+          setSelectedIndex(Math.max(selectedIndex - 1, -1));
+          break;
+        case 'Enter':
+          e.preventDefault();
+          if (selectedIndex >= 0 && selectedIndex < suggestions.length) {
+            // Select suggestion
+            const selectedSuggestion = selectSuggestion(selectedIndex);
+            if (selectedSuggestion) {
+              setQuery(selectedSuggestion);
+              setShowSuggestions(false);
+              setShowRecentHistory(false);
+              // Auto-submit with the selected suggestion after a brief delay
+              setTimeout(() => {
+                if (inputRef?.current) {
+                  const form = inputRef.current.closest('form');
+                  if (form) {
+                    const submitEvent = new Event('submit', { bubbles: true, cancelable: true });
+                    form.dispatchEvent(submitEvent);
+                  }
+                }
+              }, 150);
+            }
+          } else {
+            // No suggestion selected, perform normal search
+            setShowSuggestions(false);
+            handleSearch(e as unknown as React.FormEvent);
+          }
+          break;
+        case 'Escape':
+          e.preventDefault();
+          setShowSuggestions(false);
+          setShowRecentHistory(false);
+          clearSuggestions();
+          break;
+        default:
+          break;
+      }
+    } 
+    // Handle recent history navigation
+    else if (showRecentHistory && recentHistory.length > 0) {
+      switch (e.key) {
+        case 'ArrowDown':
+          e.preventDefault();
+          setSelectedIndex(Math.min(selectedIndex + 1, recentHistory.length - 1));
+          break;
+        case 'ArrowUp':
+          e.preventDefault();
+          setSelectedIndex(Math.max(selectedIndex - 1, -1));
+          break;
+        case 'Enter':
+          e.preventDefault();
+          if (selectedIndex >= 0 && selectedIndex < recentHistory.length) {
+            // Select history item
+            const selectedHistory = recentHistory[selectedIndex];
+            handleRecentHistoryClick(selectedHistory.query);
+          } else {
+            // No history selected, perform normal search
+            setShowRecentHistory(false);
+            handleSearch(e as unknown as React.FormEvent);
+          }
+          break;
+        case 'Escape':
+          e.preventDefault();
+          setShowRecentHistory(false);
+          setSelectedIndex(-1);
+          break;
+        default:
+          break;
+      }
+    } 
+    else {
+      // Normal enter key behavior when neither suggestions nor history are shown
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        setShowSuggestions(false);
+        setShowRecentHistory(false);
+        handleSearch(e as unknown as React.FormEvent);
+      }
     }
   };
 
@@ -186,6 +334,62 @@ const SearchForm = ({
   const handleHistoryItemSelect = (item: HistoryItem) => {
     setSelectedHistoryItem(item);
     setQuery(`Follow up on: ${item.query}`);
+  };
+
+  // Suggestion handlers
+  const handleSuggestionClick = (suggestion: string) => {
+    setQuery(suggestion);
+    clearSuggestions();
+    setShowSuggestions(false);
+    setShowRecentHistory(false);
+    
+    // Focus back on input and auto-submit after a short delay
+    if (inputRef?.current) {
+      inputRef.current.focus();
+      setTimeout(() => {
+        if (inputRef.current) {
+          const form = inputRef.current.closest('form');
+          if (form) {
+            form.requestSubmit();
+          }
+        }
+      }, 100);
+    }
+  };
+
+  // Recent history handlers
+  const handleRecentHistoryClick = (query: string) => {
+    setQuery(query);
+    setShowRecentHistory(false);
+    setShowSuggestions(false);
+    
+    // Focus back on input and auto-submit after a short delay
+    if (inputRef?.current) {
+      inputRef.current.focus();
+      setTimeout(() => {
+        if (inputRef.current) {
+          const form = inputRef.current.closest('form');
+          if (form) {
+            form.requestSubmit();
+          }
+        }
+      }, 100);
+    }
+  };
+
+  const handleInputFocus = () => {
+    setIsFocused(true);
+    // Logic is now handled in useEffect above
+  };
+
+  const handleInputBlur = (e: React.FocusEvent) => {
+    // Delay hiding suggestions to allow click events on suggestion items
+    setTimeout(() => {
+      setShowRecentHistory(false);
+      setShowSuggestions(false);
+      setSelectedIndex(-1);
+      setIsFocused(false);
+    }, 200);
   };
 
   const formatDate = (item: HistoryItem) => {
@@ -324,7 +528,7 @@ const SearchForm = ({
       </div>
 
       {/* Search Form */}
-      <div className="px-4 py-3 rounded-xl bg-slate-800/85 ring-1 ring-slate-600/40 shadow-lg">
+      <div className="relative px-4 py-3 rounded-xl bg-slate-800/85 ring-1 ring-slate-600/40 shadow-lg">
         <form onSubmit={handleSearch}>
           <div className="relative">
             <TextareaAutosize
@@ -332,8 +536,8 @@ const SearchForm = ({
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={handleKeyDown}
-              onFocus={() => setIsFocused(true)}
-              onBlur={() => setIsFocused(false)}
+              onFocus={handleInputFocus}
+              onBlur={handleInputBlur}
               placeholder={
                 searchMode === "followup"
                   ? "Ask a follow-up question based on your conversation history..."
@@ -405,6 +609,29 @@ const SearchForm = ({
             )}
           </div>
         </form>
+        
+        {/* Search Suggestions - Now inside the relative container */}
+        <SearchSuggestions
+          suggestions={suggestions}
+          isLoading={isLoadingSuggestions}
+          error={suggestionsError}
+          visible={showSuggestions && (suggestions.length > 0 || isLoadingSuggestions)}
+          selectedIndex={selectedIndex}
+          query={query}
+          onSuggestionClick={(suggestion, index) => handleSuggestionClick(suggestion)}
+          onSuggestionHover={(index) => setSelectedIndex(index)}
+        />
+        
+        {/* Recent Global History */}
+        <RecentHistory
+          history={recentHistory}
+          isLoading={isLoadingRecentHistory}
+          error={recentHistoryError}
+          visible={showRecentHistory && (recentHistory.length > 0 || isLoadingRecentHistory)}
+          selectedIndex={selectedIndex}
+          onHistoryClick={(query, index) => handleRecentHistoryClick(query)}
+          onHistoryHover={(index) => setSelectedIndex(index)}
+        />
       </div>
     </div>
   );

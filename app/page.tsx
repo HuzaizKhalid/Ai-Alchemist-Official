@@ -43,8 +43,24 @@ export default function HomePage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ query }),
       });
-      if (!response.ok)
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        
+        if (response.status === 429) {
+          if (errorData.error?.includes('Daily search limit')) {
+            toast.error("Daily search limit reached! Try again tomorrow or upgrade to Pro.");
+          } else if (errorData.error?.includes('Rate limit')) {
+            toast.error("Too many requests! Please wait a moment and try again.");
+          } else {
+            toast.error("Rate limit exceeded. Please try again later.");
+          }
+        } else {
+          toast.error(`Search failed: ${errorData.error || 'Unknown error'}`);
+        }
         throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
       const data = await response.json();
       await addHistory({ ...data, userId: user.id });
       setSearchActive(true);
@@ -52,7 +68,10 @@ export default function HomePage() {
       toast.success("Search successful!");
       setSearchResults(data);
     } catch (error) {
-      toast.error("Search failed. Please try again.");
+      // Only show generic error if we haven't shown a specific one
+      if (!(error as Error).message.includes('HTTP error!')) {
+        toast.error("Search failed. Please try again.");
+      }
       console.error("Search failed:", error);
     } finally {
       setIsLoading(false);

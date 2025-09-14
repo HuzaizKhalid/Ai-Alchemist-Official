@@ -9,13 +9,13 @@ import { logger } from "@/lib/logger";
 export interface Subscription {
   stripeSubscriptionId: string;
   status:
-  | "active"
-  | "past_due"
-  | "canceled"
-  | "unpaid"
-  | "trialing"
-  | "incomplete"
-  | "incomplete_expired";
+    | "active"
+    | "past_due"
+    | "canceled"
+    | "unpaid"
+    | "trialing"
+    | "incomplete"
+    | "incomplete_expired";
   startDate: Date;
   endDate?: Date;
   plan: "free" | "pro";
@@ -184,7 +184,9 @@ export class UserModel {
       return true; // New day, reset count
     }
 
-    return user.searchesUsed < 3; // Free tier limit
+    // Higher limit for development/testing
+    const dailyLimit = process.env.NODE_ENV === "development" ? 50 : 3;
+    return user.searchesUsed < dailyLimit;
   }
 
   static async updateStripeCustomerId(

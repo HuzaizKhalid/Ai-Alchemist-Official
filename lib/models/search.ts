@@ -70,4 +70,15 @@ export class SearchModel {
       }
     )
   }
+
+  static async getRecentGlobalHistory(limit = 5): Promise<SearchRecord[]> {
+    const db = await getDatabase()
+    const searches = db.collection<SearchRecord>("searches")
+
+    return await searches
+      .find({})
+      .sort({ createdAt: -1 })
+      .limit(limit)
+      .toArray()
+  }
 }
