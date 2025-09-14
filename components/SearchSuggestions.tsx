@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useEffect, useRef } from 'react';
-import { Search, TrendingUp, Clock, Sparkles } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import React, { useEffect, useRef } from "react";
+import { Search, TrendingUp, Clock, Sparkles } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface SearchSuggestionsProps {
   suggestions: string[];
@@ -23,18 +23,20 @@ const SearchSuggestions: React.FC<SearchSuggestionsProps> = ({
   onSuggestionClick,
   onSuggestionHover,
   visible,
-  query
+  query,
 }) => {
   const listRef = useRef<HTMLDivElement>(null);
 
   // Scroll selected item into view
   useEffect(() => {
     if (selectedIndex >= 0 && listRef.current) {
-      const selectedElement = listRef.current.children[selectedIndex] as HTMLElement;
+      const selectedElement = listRef.current.children[
+        selectedIndex
+      ] as HTMLElement;
       if (selectedElement) {
         selectedElement.scrollIntoView({
-          behavior: 'smooth',
-          block: 'nearest'
+          behavior: "smooth",
+          block: "nearest",
         });
       }
     }
@@ -45,16 +47,24 @@ const SearchSuggestions: React.FC<SearchSuggestionsProps> = ({
   // Helper function to highlight matching parts of suggestions
   const highlightMatch = (text: string, query: string) => {
     if (!query.trim()) return text;
-    
-    const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+
+    const regex = new RegExp(
+      `(${query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`,
+      "gi"
+    );
     const parts = text.split(regex);
-    
-    return parts.map((part, index) => 
+
+    return parts.map((part, index) =>
       regex.test(part) ? (
-        <span key={index} className="text-emerald-300 font-medium bg-emerald-500/10 px-0.5 rounded">
+        <span
+          key={index}
+          className="text-emerald-300 font-medium bg-emerald-500/10 px-0.5 rounded"
+        >
           {part}
         </span>
-      ) : part
+      ) : (
+        part
+      )
     );
   };
 
@@ -110,12 +120,14 @@ const SearchSuggestions: React.FC<SearchSuggestionsProps> = ({
                   onMouseEnter={() => onSuggestionHover(index)}
                 >
                   {/* Icon */}
-                  <div className={cn(
-                    "w-4 h-4 mt-0.5 transition-colors",
-                    selectedIndex === index 
-                      ? "text-emerald-300" 
-                      : "text-slate-500 group-hover:text-slate-400"
-                  )}>
+                  <div
+                    className={cn(
+                      "w-4 h-4 mt-0.5 transition-colors",
+                      selectedIndex === index
+                        ? "text-emerald-300"
+                        : "text-slate-500 group-hover:text-slate-400"
+                    )}
+                  >
                     {index === 0 && query.length < 2 ? (
                       <TrendingUp className="w-4 h-4" />
                     ) : (
@@ -125,20 +137,24 @@ const SearchSuggestions: React.FC<SearchSuggestionsProps> = ({
 
                   {/* Suggestion Text */}
                   <div className="flex-1 min-w-0">
-                    <div className={cn(
-                      "text-sm leading-relaxed transition-colors",
-                      selectedIndex === index
-                        ? "text-white"
-                        : "text-slate-200 group-hover:text-white"
-                    )}>
+                    <div
+                      className={cn(
+                        "text-sm leading-relaxed transition-colors",
+                        selectedIndex === index
+                          ? "text-white"
+                          : "text-slate-200 group-hover:text-white"
+                      )}
+                    >
                       {highlightMatch(suggestion, query)}
                     </div>
-                    
+
                     {/* Popular indicator for top suggestions */}
                     {index === 0 && query.length < 2 && (
                       <div className="flex items-center space-x-1 mt-1">
                         <Sparkles className="w-3 h-3 text-amber-400" />
-                        <span className="text-xs text-amber-400/80">Popular</span>
+                        <span className="text-xs text-amber-400/80">
+                          Popular
+                        </span>
                       </div>
                     )}
                   </div>
@@ -158,36 +174,47 @@ const SearchSuggestions: React.FC<SearchSuggestionsProps> = ({
               <div className="flex items-center justify-between text-xs text-slate-500">
                 <div className="flex items-center space-x-4">
                   <div className="flex items-center space-x-1">
-                    <kbd className="px-1.5 py-0.5 bg-slate-600/50 rounded text-xs">↑↓</kbd>
+                    <kbd className="px-1.5 py-0.5 bg-slate-600/50 rounded text-xs">
+                      ↑↓
+                    </kbd>
                     <span>navigate</span>
                   </div>
                   <div className="flex items-center space-x-1">
-                    <kbd className="px-1.5 py-0.5 bg-slate-600/50 rounded text-xs">↵</kbd>
+                    <kbd className="px-1.5 py-0.5 bg-slate-600/50 rounded text-xs">
+                      ↵
+                    </kbd>
                     <span>select</span>
                   </div>
                   <div className="flex items-center space-x-1">
-                    <kbd className="px-1.5 py-0.5 bg-slate-600/50 rounded text-xs">Esc</kbd>
+                    <kbd className="px-1.5 py-0.5 bg-slate-600/50 rounded text-xs">
+                      Esc
+                    </kbd>
                     <span>close</span>
                   </div>
                 </div>
-                <span className="text-slate-600">{suggestions.length} suggestions</span>
+                <span className="text-slate-600">
+                  {suggestions.length} suggestions
+                </span>
               </div>
             </div>
           </>
         )}
 
         {/* No Suggestions State */}
-        {!isLoading && !error && suggestions.length === 0 && query.length >= 2 && (
-          <div className="flex flex-col items-center justify-center py-6 px-6 text-slate-400">
-            <Search className="w-8 h-8 mb-2 text-slate-600" />
-            <p className="text-sm text-center">
-              No suggestions found for "{query}"
-            </p>
-            <p className="text-xs text-slate-500 mt-1">
-              Try a different search term
-            </p>
-          </div>
-        )}
+        {!isLoading &&
+          !error &&
+          suggestions.length === 0 &&
+          query.length >= 2 && (
+            <div className="flex flex-col items-center justify-center py-6 px-6 text-slate-400">
+              <Search className="w-8 h-8 mb-2 text-slate-600" />
+              <p className="text-sm text-center">
+                No suggestions found for "{query}"
+              </p>
+              <p className="text-xs text-slate-500 mt-1">
+                Try a different search term
+              </p>
+            </div>
+          )}
       </div>
     </div>
   );

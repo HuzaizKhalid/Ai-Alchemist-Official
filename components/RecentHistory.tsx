@@ -1,9 +1,9 @@
 "use client";
 
-import React from 'react';
-import { Clock, Users, TrendingUp } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { RecentHistoryItem } from '@/hooks/use-recent-global-history';
+import React from "react";
+import { Clock, Users, TrendingUp } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { RecentHistoryItem } from "@/hooks/use-recent-global-history";
 
 interface RecentHistoryProps {
   history: RecentHistoryItem[];
@@ -31,7 +31,7 @@ const RecentHistory: React.FC<RecentHistoryProps> = ({
     const now = new Date();
     const diffInMs = now.getTime() - date.getTime();
     const diffInHours = diffInMs / (1000 * 60 * 60);
-    
+
     if (diffInHours < 1) {
       const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
       return `${diffInMinutes}m ago`;
@@ -102,16 +102,18 @@ const RecentHistory: React.FC<RecentHistoryProps> = ({
                         {formatTime(item.createdAt)}
                       </span>
                     </div>
-                    <p className={cn(
-                      "text-sm truncate transition-colors",
-                      selectedIndex === index 
-                        ? "text-white font-medium" 
-                        : "text-slate-200 group-hover:text-white"
-                    )}>
+                    <p
+                      className={cn(
+                        "text-sm truncate transition-colors",
+                        selectedIndex === index
+                          ? "text-white font-medium"
+                          : "text-slate-200 group-hover:text-white"
+                      )}
+                    >
                       {item.displayQuery}
                     </p>
                   </div>
-                  
+
                   {/* Indicator for selected item */}
                   {selectedIndex === index && (
                     <div className="flex-shrink-0 ml-2">
