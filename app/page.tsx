@@ -7,6 +7,7 @@ import { AuthModal } from "@/components/auth-modal";
 // import { AuthDebugger } from "@/components/auth-debugger";
 import { useAuth } from "@/hooks/use-auth";
 import SearchForm from "@/components/SearchForm";
+import LiveSuggestions from "@/components/LiveSuggestions";
 import Background from "@/components/Background";
 import { Spotlight } from "@/components/ui/spotlight-new";
 import { addHistory } from "@/lib/historyClient";
@@ -28,6 +29,9 @@ export default function HomePage() {
   const { user } = useAuth();
   const { setSearchActive, isSearchActive } = useSearch();
   const inputRef = useRef<HTMLTextAreaElement | null>(null);
+
+  // Suggestions state management
+  const [suggestionsState, setSuggestionsState] = useState<any>(null);
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -113,27 +117,29 @@ export default function HomePage() {
         <Spotlight />
 
         <main className="flex-1 flex flex-col justify-center overflow-y-auto pt-12">
-          {!isSearchActive ? (
-            <div className="w-full max-w-4xl mx-auto px-6 text-center">
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-50 mb-6 leading-tight tracking-tight drop-shadow-md">
-                What do you want to know{" "}
-                <span className="bg-gradient-to-r from-cyan-300 to-violet-400 bg-clip-text text-transparent">
-                  sustainably
-                </span>
-                ?
-              </h1>
+          {/* Always show main content */}
+          <div className="w-full max-w-4xl mx-auto px-6 text-center mb-8">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-50 mb-6 leading-tight tracking-tight drop-shadow-md">
+              What do you want to know{" "}
+              <span className="bg-gradient-to-r from-cyan-300 to-violet-400 bg-clip-text text-transparent">
+                sustainably
+              </span>
+              ?
+            </h1>
 
-              <div className="relative max-w-3xl mx-auto rounded-3xl p-[1px] bg-gradient-to-r mb-16 from-cyan-400/20 to-violet-400/20">
-                <div className="rounded-[23px] p-6 backdrop-blur-lg bg-slate-800/80">
-                  <p className="text-base lg:text-lg text-slate-100 leading-relaxed font-normal">
-                    Get AI-powered answers while tracking the environmental
-                    impact of your queries! Set daily limits and discover the
-                    most energy-efficient models for your needs.
-                  </p>
-                </div>
+            <div className="relative max-w-3xl mx-auto rounded-3xl p-[1px] bg-gradient-to-r mb-16 from-cyan-400/20 to-violet-400/20">
+              <div className="rounded-[23px] p-6 backdrop-blur-lg bg-slate-800/80">
+                <p className="text-base lg:text-lg text-slate-100 leading-relaxed font-normal">
+                  Get AI-powered answers while tracking the environmental
+                  impact of your queries! Set daily limits and discover the
+                  most energy-efficient models for your needs.
+                </p>
               </div>
             </div>
-          ) : (
+          </div>
+
+          {/* Search Results - only show when active */}
+          {isSearchActive && (
             <div className="w-full mx-auto my-12 mt-16 md:mt-28">
               {searchMode === "followup" ? (
                 <ConversationHistory onNewSearch={handleNewSearch} />
@@ -163,6 +169,7 @@ export default function HomePage() {
               isLoading={isLoading}
               inputRef={inputRef}
               onSearchModeChange={handleSearchModeChange}
+              onSuggestionsStateChange={setSuggestionsState}
             />
             <div className="mt-3 px-2">
               <p className="text-xs text-slate-400 text-center leading-relaxed">
@@ -173,6 +180,12 @@ export default function HomePage() {
             </div>
           </div>
         </div>
+
+        {/* Live AI Suggestions - positioned between SearchForm and Timeline */}
+        <LiveSuggestions 
+          suggestionsState={suggestionsState} 
+          query={query} 
+        />
       </div>
 
       {/* Timeline + Footer */}

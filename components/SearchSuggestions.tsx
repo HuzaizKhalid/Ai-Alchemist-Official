@@ -69,7 +69,7 @@ const SearchSuggestions: React.FC<SearchSuggestionsProps> = ({
   };
 
   return (
-    <div className="absolute top-full left-0 right-0 mt-1 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+    <div className="absolute top-full left-0 right-0 mt-1 z-[9999] animate-in fade-in slide-in-from-top-2 duration-200">
       <div className="bg-slate-800/95 backdrop-blur-md border border-slate-600/50 rounded-xl shadow-2xl max-h-80 overflow-hidden">
         {/* Loading State */}
         {isLoading && (
@@ -106,18 +106,26 @@ const SearchSuggestions: React.FC<SearchSuggestionsProps> = ({
             </div>
 
             {/* Suggestions */}
-            <div ref={listRef} className="max-h-64 overflow-y-auto">
+            <div ref={listRef} className="max-h-64 overflow-y-auto" style={{ pointerEvents: 'auto' }}>
               {suggestions.map((suggestion, index) => (
                 <div
                   key={index}
                   className={cn(
-                    "px-4 py-3 cursor-pointer transition-all duration-150 flex items-start space-x-3 group",
+                    "px-4 py-3 cursor-pointer transition-all duration-150 flex items-start space-x-3 group relative",
+                    "hover:bg-slate-700/50 border-l-2",
                     selectedIndex === index
-                      ? "bg-emerald-500/20 border-l-2 border-emerald-400"
-                      : "hover:bg-slate-700/50 border-l-2 border-transparent"
+                      ? "bg-emerald-500/20 border-emerald-400 text-white"
+                      : "border-transparent text-slate-200"
                   )}
+                  style={{ pointerEvents: 'auto' }}
                   onClick={() => onSuggestionClick(suggestion, index)}
                   onMouseEnter={() => onSuggestionHover(index)}
+                  onMouseLeave={() => {
+                    // Only clear selection if this item was selected via hover (not keyboard)
+                    if (selectedIndex === index) {
+                      onSuggestionHover(-1);
+                    }
+                  }}
                 >
                   {/* Icon */}
                   <div
