@@ -106,7 +106,11 @@ const SearchSuggestions: React.FC<SearchSuggestionsProps> = ({
             </div>
 
             {/* Suggestions */}
-            <div ref={listRef} className="max-h-64 overflow-y-auto" style={{ pointerEvents: 'auto' }}>
+            <div
+              ref={listRef}
+              className="max-h-64 overflow-y-auto"
+              style={{ pointerEvents: "auto" }}
+            >
               {suggestions.map((suggestion, index) => (
                 <div
                   key={index}
@@ -117,7 +121,7 @@ const SearchSuggestions: React.FC<SearchSuggestionsProps> = ({
                       ? "bg-emerald-500/20 border-emerald-400 text-white"
                       : "border-transparent text-slate-200"
                   )}
-                  style={{ pointerEvents: 'auto' }}
+                  style={{ pointerEvents: "auto" }}
                   onClick={() => onSuggestionClick(suggestion, index)}
                   onMouseEnter={() => onSuggestionHover(index)}
                   onMouseLeave={() => {

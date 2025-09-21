@@ -28,13 +28,19 @@ const LiveSuggestions: React.FC<LiveSuggestionsProps> = ({
     if (!query.trim()) return text;
 
     try {
-      const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`, "gi");
+      const regex = new RegExp(
+        `(${query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`,
+        "gi"
+      );
       const parts = text.split(regex);
 
       return parts.map((part, index) => {
         if (part.toLowerCase() === query.toLowerCase()) {
           return (
-            <span key={index} className="bg-cyan-500/20 text-cyan-300 font-medium rounded px-1">
+            <span
+              key={index}
+              className="bg-cyan-500/20 text-cyan-300 font-medium rounded px-1"
+            >
               {part}
             </span>
           );
@@ -56,7 +62,9 @@ const LiveSuggestions: React.FC<LiveSuggestionsProps> = ({
               <div className="p-4">
                 <div className="flex items-center justify-center gap-2">
                   <div className="animate-spin rounded-full h-4 w-4 border-2 border-cyan-400 border-t-transparent"></div>
-                  <span className="text-sm text-slate-400">Finding suggestions...</span>
+                  <span className="text-sm text-slate-400">
+                    Finding suggestions...
+                  </span>
                 </div>
               </div>
             ) : suggestionsState.suggestionsError ? (
@@ -70,7 +78,9 @@ const LiveSuggestions: React.FC<LiveSuggestionsProps> = ({
                 <div className="p-3 border-b border-slate-700/50">
                   <div className="flex items-center gap-2">
                     <Sparkles className="w-4 h-4 text-cyan-400" />
-                    <span className="text-sm font-medium text-slate-300">AI Suggestions</span>
+                    <span className="text-sm font-medium text-slate-300">
+                      AI Suggestions
+                    </span>
                     <div className="flex-1" />
                     <TrendingUp className="w-4 h-4 text-slate-500" />
                   </div>
@@ -82,11 +92,16 @@ const LiveSuggestions: React.FC<LiveSuggestionsProps> = ({
                       className={cn(
                         "flex items-center gap-3 p-3 transition-all cursor-pointer border-b border-slate-700/30 last:border-b-0",
                         "hover:bg-slate-700/50 hover:border-slate-600/50",
-                        suggestionsState.selectedIndex === index && "bg-slate-700/70 border-cyan-500/30"
+                        suggestionsState.selectedIndex === index &&
+                          "bg-slate-700/70 border-cyan-500/30"
                       )}
-                      onClick={() => suggestionsState.handleSuggestionClick(suggestion)}
-                      onMouseEnter={() => suggestionsState.setSelectedIndex(index)}
-                      style={{ pointerEvents: 'auto' }}
+                      onClick={() =>
+                        suggestionsState.handleSuggestionClick(suggestion)
+                      }
+                      onMouseEnter={() =>
+                        suggestionsState.setSelectedIndex(index)
+                      }
+                      style={{ pointerEvents: "auto" }}
                     >
                       <Search className="w-4 h-4 text-slate-500 flex-shrink-0" />
                       <span className="text-slate-200 text-sm flex-1 leading-relaxed">

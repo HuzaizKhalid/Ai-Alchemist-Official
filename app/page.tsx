@@ -8,6 +8,8 @@ import { AuthModal } from "@/components/auth-modal";
 import { useAuth } from "@/hooks/use-auth";
 import SearchForm from "@/components/SearchForm";
 import LiveSuggestions from "@/components/LiveSuggestions";
+import SimpleChatWidget from "@/components/SimpleChatWidget";
+import ChatDemo from "@/components/ChatDemo";
 import Background from "@/components/Background";
 import { Spotlight } from "@/components/ui/spotlight-new";
 import { addHistory } from "@/lib/historyClient";
@@ -130,9 +132,9 @@ export default function HomePage() {
             <div className="relative max-w-3xl mx-auto rounded-3xl p-[1px] bg-gradient-to-r mb-16 from-cyan-400/20 to-violet-400/20">
               <div className="rounded-[23px] p-6 backdrop-blur-lg bg-slate-800/80">
                 <p className="text-base lg:text-lg text-slate-100 leading-relaxed font-normal">
-                  Get AI-powered answers while tracking the environmental
-                  impact of your queries! Set daily limits and discover the
-                  most energy-efficient models for your needs.
+                  Get AI-powered answers while tracking the environmental impact
+                  of your queries! Set daily limits and discover the most
+                  energy-efficient models for your needs.
                 </p>
               </div>
             </div>
@@ -182,10 +184,7 @@ export default function HomePage() {
         </div>
 
         {/* Live AI Suggestions - positioned between SearchForm and Timeline */}
-        <LiveSuggestions 
-          suggestionsState={suggestionsState} 
-          query={query} 
-        />
+        <LiveSuggestions suggestionsState={suggestionsState} query={query} />
       </div>
 
       {/* Timeline + Footer */}
@@ -205,6 +204,18 @@ export default function HomePage() {
         isOpen={showAuthModal}
         onClose={() => setShowAuthModal(false)}
       />
+
+      {/* Simple Custom Chat Widget - No bot, clean contact form */}
+      <SimpleChatWidget
+        adminEmail="paulsemz17@gmail.com"
+        siteName="Alchemist AI"
+      />
+
+      {/* Tawk.to Widget Removed - was causing console errors */}
+      {/* <ChatWidget /> */}
+
+      {/* Chat Demo Component for Testing */}
+      <ChatDemo />
 
       {/* Auth Debugger - Remove in production */}
       {/* <AuthDebugger /> */}
