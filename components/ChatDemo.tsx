@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState } from 'react';
-import { Settings, MessageCircle, Mail, ExternalLink } from 'lucide-react';
+import React, { useState } from "react";
+import { Settings, MessageCircle, Mail, ExternalLink } from "lucide-react";
 
 const ChatDemo: React.FC = () => {
   const [showDemo, setShowDemo] = useState(false);
@@ -36,11 +36,16 @@ const ChatDemo: React.FC = () => {
         <div className="bg-slate-800/50 p-3 rounded-lg border border-slate-700/30">
           <div className="flex items-center gap-2 mb-2">
             <MessageCircle className="w-4 h-4 text-cyan-400" />
-            <span className="text-slate-200 font-medium text-sm">Custom Chat Widget</span>
-            <span className="text-green-400 text-xs bg-green-400/10 px-2 py-1 rounded-full">ACTIVE</span>
+            <span className="text-slate-200 font-medium text-sm">
+              Custom Chat Widget
+            </span>
+            <span className="text-green-400 text-xs bg-green-400/10 px-2 py-1 rounded-full">
+              ACTIVE
+            </span>
           </div>
           <p className="text-slate-400 text-xs mb-3">
-            Custom-built chat with email integration. Messages sent directly to admin email.
+            Custom-built chat with email integration. Messages sent directly to
+            admin email.
           </p>
           <div className="flex items-center gap-2 text-xs">
             <Mail className="w-3 h-3 text-cyan-400" />
@@ -51,11 +56,16 @@ const ChatDemo: React.FC = () => {
         <div className="bg-slate-800/30 p-3 rounded-lg border border-slate-700/20">
           <div className="flex items-center gap-2 mb-2">
             <MessageCircle className="w-4 h-4 text-violet-400" />
-            <span className="text-slate-200 font-medium text-sm">Tawk.to Widget</span>
-            <span className="text-slate-500 text-xs bg-slate-700/50 px-2 py-1 rounded-full">AVAILABLE</span>
+            <span className="text-slate-200 font-medium text-sm">
+              Tawk.to Widget
+            </span>
+            <span className="text-slate-500 text-xs bg-slate-700/50 px-2 py-1 rounded-full">
+              AVAILABLE
+            </span>
           </div>
           <p className="text-slate-400 text-xs mb-3">
-            Third-party live chat service. Professional features and mobile apps.
+            Third-party live chat service. Professional features and mobile
+            apps.
           </p>
           <div className="flex items-center gap-2 text-xs">
             <ExternalLink className="w-3 h-3 text-violet-400" />

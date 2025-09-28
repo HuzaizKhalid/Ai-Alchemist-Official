@@ -5,12 +5,14 @@
 Your Alchemist AI application now has **two chat solutions** implemented:
 
 ### Option 1: Custom Chat Widget (Recommended) ⭐
+
 - **Built-in email integration** using Nodemailer
 - **Custom styling** to match your app's design
 - **Direct admin email notifications**
 - **Full control** over functionality and appearance
 
 ### Option 2: Tawk.to Integration (Alternative)
+
 - **Third-party service** (completely free)
 - **Professional chat interface**
 - **Mobile app available** for admins
@@ -23,6 +25,7 @@ Your Alchemist AI application now has **two chat solutions** implemented:
 ### For Custom Chat Widget (Currently Active):
 
 1. **Configure Email Settings:**
+
    ```bash
    # In your .env.local file:
    EMAIL_USER=your-gmail@gmail.com
@@ -31,6 +34,7 @@ Your Alchemist AI application now has **two chat solutions** implemented:
    ```
 
 2. **Gmail Setup:**
+
    - Go to [Google Account Settings](https://myaccount.google.com/)
    - Enable 2-Factor Authentication
    - Generate an "App Password" for email
@@ -45,15 +49,18 @@ Your Alchemist AI application now has **two chat solutions** implemented:
 ### For Tawk.to Widget (Alternative):
 
 1. **Create Tawk.to Account:**
+
    - Visit [tawk.to](https://www.tawk.to/)
    - Sign up for free
    - Add your website
 
 2. **Get Widget Code:**
+
    - In Tawk.to dashboard, go to "Administration" > "Chat Widget"
    - Copy your Property ID and Widget ID
 
 3. **Update Environment:**
+
    ```bash
    NEXT_PUBLIC_TAWK_PROPERTY_ID=your_property_id
    NEXT_PUBLIC_TAWK_WIDGET_ID=your_widget_id
@@ -70,6 +77,7 @@ Your Alchemist AI application now has **two chat solutions** implemented:
 ## 🎨 Features Included
 
 ### Custom Chat Widget Features:
+
 ✅ **Email Collection**: Collects user name and email before chat
 ✅ **Email Notifications**: Sends formatted emails to admin
 ✅ **Auto-replies**: Confirms message received
@@ -78,6 +86,7 @@ Your Alchemist AI application now has **two chat solutions** implemented:
 ✅ **Reply-to Setup**: Admin can reply directly via email
 
 ### Tawk.to Features:
+
 ✅ **Live Chat**: Real-time messaging
 ✅ **Mobile Apps**: iOS/Android apps for admins
 ✅ **File Sharing**: Users can send images/files
@@ -113,6 +122,7 @@ Reply directly to this email to respond to John Doe
 ## 🛠 Customization Options
 
 ### Custom Widget Styling:
+
 ```tsx
 // In CustomChatWidget.tsx, you can modify:
 - Colors and gradients
@@ -123,6 +133,7 @@ Reply directly to this email to respond to John Doe
 ```
 
 ### Custom Widget Behavior:
+
 ```tsx
 // You can customize:
 - Auto-reply messages
@@ -133,6 +144,7 @@ Reply directly to this email to respond to John Doe
 ```
 
 ### Tawk.to Customization:
+
 ```tsx
 // In ChatWidget.tsx, you can:
 - Change widget position
@@ -146,6 +158,7 @@ Reply directly to this email to respond to John Doe
 ## 🔧 Technical Implementation
 
 ### File Structure:
+
 ```
 components/
 ├── ChatWidget.tsx           # Tawk.to integration
@@ -161,9 +174,11 @@ app/api/
 ```
 
 ### API Endpoints:
+
 - `POST /api/send-chat-email` - Sends chat messages to admin email
 
 ### Dependencies Added:
+
 - `nodemailer` - Email sending
 - `@types/nodemailer` - TypeScript support
 
@@ -172,16 +187,19 @@ app/api/
 ## 🚨 Important Notes
 
 ### Security:
+
 - Never commit `.env.local` to version control
 - Use App Passwords, not regular passwords
 - Validate all email inputs
 
 ### Email Providers:
+
 - **Gmail**: Works with App Passwords
 - **Outlook**: Use SMTP settings
 - **SendGrid/Mailgun**: For production scale
 
 ### Production Considerations:
+
 - Set up proper email service (SendGrid, etc.)
 - Add rate limiting to prevent spam
 - Consider adding CAPTCHA for security
@@ -199,6 +217,7 @@ app/api/
 ✅ Professional email templates
 
 **Next Steps:**
+
 1. Add your email credentials to `.env.local`
 2. Test the chat functionality
 3. Customize messages/styling if needed

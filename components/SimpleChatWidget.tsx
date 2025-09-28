@@ -86,21 +86,27 @@ const CustomChatWidget: React.FC<CustomChatWidgetProps> = ({
 
   return (
     <>
-      {/* Chat Icon */}
-      <div className="fixed bottom-6 right-6 z-50">
+      {/* Chat Icon - Responsive positioning */}
+      <div
+        className="fixed z-50
+                      /* Mobile: Top left corner above main heading */
+                      top-36 left-6 
+                      /* Desktop: Traditional bottom-right */
+                      sm:bottom-6 sm:right-6 sm:left-auto sm:top-auto"
+      >
         <button
           onClick={() => setIsOpen(!isOpen)}
           className="relative group bg-gradient-to-br from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 
-                     rounded-full p-3 shadow-2xl transition-all duration-300 transform hover:scale-105
+                     rounded-full p-2.5 shadow-2xl transition-all duration-300 transform hover:scale-105
                      ring-4 ring-blue-500/20 hover:ring-blue-500/40"
         >
           {/* Your Custom Logo */}
           <Image
             src="/live-chat_9165147.png"
             alt="Chat Support"
-            width={32}
-            height={32}
-            className="w-8 h-8 object-contain filter brightness-0 invert"
+            width={28}
+            height={28}
+            className="w-7 h-7 object-contain filter brightness-0 invert"
             priority
           />
 
@@ -109,12 +115,16 @@ const CustomChatWidget: React.FC<CustomChatWidgetProps> = ({
         </button>
       </div>
 
-      {/* Chat Window */}
+      {/* Chat Window - Responsive positioning */}
       {isOpen && (
         <div
-          className="fixed bottom-20 right-6 z-50 w-96 h-[32rem] bg-gray-900/95 backdrop-blur-xl 
+          className="fixed z-50 w-96 h-[32rem] bg-gray-900/95 backdrop-blur-xl 
                         rounded-2xl shadow-2xl border border-gray-700/50 overflow-hidden
-                        max-h-[90vh] sm:w-80 sm:h-[28rem]"
+                        max-h-[90vh]
+                        /* Mobile: Position below top-left icon */
+                        top-36 left-6
+                        /* Desktop: Traditional positioning */
+                        sm:bottom-20 sm:right-6 sm:left-auto sm:top-auto sm:w-80 sm:h-[28rem]"
         >
           {/* Header */}
           <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-4 flex justify-between items-center">

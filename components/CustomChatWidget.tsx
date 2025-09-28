@@ -1,13 +1,13 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from 'react';
-import { MessageCircle, Send, X, User, Bot } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import React, { useState, useRef, useEffect } from "react";
+import { MessageCircle, Send, X, User, Bot } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface Message {
   id: string;
   text: string;
-  sender: 'user' | 'admin';
+  sender: "user" | "admin";
   timestamp: Date;
   senderName?: string;
   senderEmail?: string;
@@ -19,39 +19,42 @@ interface CustomChatWidgetProps {
 }
 
 const CustomChatWidget: React.FC<CustomChatWidgetProps> = ({
-  adminEmail = 'admin@example.com',
-  siteName = 'Alchemist AI'
+  adminEmail = "admin@example.com",
+  siteName = "Alchemist AI",
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
-      id: '1',
+      id: "1",
       text: `Hi! Welcome to ${siteName}. How can we help you today?`,
-      sender: 'admin',
+      sender: "admin",
       timestamp: new Date(),
-      senderName: 'Support Team'
-    }
+      senderName: "Support Team",
+    },
   ]);
-  const [currentMessage, setCurrentMessage] = useState('');
-  const [userEmail, setUserEmail] = useState('');
-  const [userName, setUserName] = useState('');
+  const [currentMessage, setCurrentMessage] = useState("");
+  const [userEmail, setUserEmail] = useState("");
+  const [userName, setUserName] = useState("");
   const [isEmailSet, setIsEmailSet] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const sendEmailNotification = async (message: string, userInfo: { name: string; email: string }) => {
+  const sendEmailNotification = async (
+    message: string,
+    userInfo: { name: string; email: string }
+  ) => {
     try {
       // Using a simple fetch to send email via your backend
       // You'll need to implement this endpoint
-      const response = await fetch('/api/send-chat-email', {
-        method: 'POST',
+      const response = await fetch("/api/send-chat-email", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           to: adminEmail,
@@ -63,10 +66,10 @@ const CustomChatWidget: React.FC<CustomChatWidgetProps> = ({
       });
 
       if (!response.ok) {
-        console.warn('Failed to send email notification');
+        console.warn("Failed to send email notification");
       }
     } catch (error) {
-      console.error('Error sending email notification:', error);
+      console.error("Error sending email notification:", error);
     }
   };
 
@@ -79,20 +82,23 @@ const CustomChatWidget: React.FC<CustomChatWidgetProps> = ({
     const newMessage: Message = {
       id: Date.now().toString(),
       text: currentMessage.trim(),
-      sender: 'user',
+      sender: "user",
       timestamp: new Date(),
       senderName: userName,
-      senderEmail: userEmail
+      senderEmail: userEmail,
     };
 
     // Add message to chat
-    setMessages(prev => [...prev, newMessage]);
-    
+    setMessages((prev) => [...prev, newMessage]);
+
     // Send email notification to admin
-    await sendEmailNotification(currentMessage.trim(), { name: userName, email: userEmail });
+    await sendEmailNotification(currentMessage.trim(), {
+      name: userName,
+      email: userEmail,
+    });
 
     // Clear input
-    setCurrentMessage('');
+    setCurrentMessage("");
     setIsLoading(false);
 
     // Auto-reply after a short delay (optional)
@@ -100,11 +106,11 @@ const CustomChatWidget: React.FC<CustomChatWidgetProps> = ({
       const autoReply: Message = {
         id: (Date.now() + 1).toString(),
         text: "Thank you for your message! We'll get back to you as soon as possible via email.",
-        sender: 'admin',
+        sender: "admin",
         timestamp: new Date(),
-        senderName: 'Support Team'
+        senderName: "Support Team",
       };
-      setMessages(prev => [...prev, autoReply]);
+      setMessages((prev) => [...prev, autoReply]);
     }, 1500);
   };
 
@@ -116,7 +122,7 @@ const CustomChatWidget: React.FC<CustomChatWidgetProps> = ({
   };
 
   const formatTime = (date: Date) => {
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
   };
 
   if (!isOpen) {
@@ -144,7 +150,9 @@ const CustomChatWidget: React.FC<CustomChatWidgetProps> = ({
             <Bot className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h3 className="font-semibold text-white text-sm">{siteName} Support</h3>
+            <h3 className="font-semibold text-white text-sm">
+              {siteName} Support
+            </h3>
             <p className="text-xs text-cyan-100">Typically replies instantly</p>
           </div>
         </div>
@@ -160,8 +168,12 @@ const CustomChatWidget: React.FC<CustomChatWidgetProps> = ({
         /* Email Collection Form */
         <div className="flex-1 p-4 flex flex-col justify-center">
           <div className="text-center mb-4">
-            <h4 className="text-slate-200 font-medium mb-2">Start a conversation</h4>
-            <p className="text-slate-400 text-sm">We'll send our replies to your email</p>
+            <h4 className="text-slate-200 font-medium mb-2">
+              Start a conversation
+            </h4>
+            <p className="text-slate-400 text-sm">
+              We'll send our replies to your email
+            </p>
           </div>
           <form onSubmit={handleEmailSubmit} className="space-y-3">
             <input
@@ -198,22 +210,26 @@ const CustomChatWidget: React.FC<CustomChatWidgetProps> = ({
                 key={message.id}
                 className={cn(
                   "flex gap-2",
-                  message.sender === 'user' ? 'justify-end' : 'justify-start'
+                  message.sender === "user" ? "justify-end" : "justify-start"
                 )}
               >
                 <div
                   className={cn(
                     "max-w-[80%] p-3 rounded-lg text-sm",
-                    message.sender === 'user'
-                      ? 'bg-gradient-to-r from-cyan-500 to-violet-500 text-white rounded-br-sm'
-                      : 'bg-slate-700 text-slate-200 rounded-bl-sm'
+                    message.sender === "user"
+                      ? "bg-gradient-to-r from-cyan-500 to-violet-500 text-white rounded-br-sm"
+                      : "bg-slate-700 text-slate-200 rounded-bl-sm"
                   )}
                 >
                   <p>{message.text}</p>
-                  <p className={cn(
-                    "text-xs mt-1 opacity-70",
-                    message.sender === 'user' ? 'text-cyan-100' : 'text-slate-400'
-                  )}>
+                  <p
+                    className={cn(
+                      "text-xs mt-1 opacity-70",
+                      message.sender === "user"
+                        ? "text-cyan-100"
+                        : "text-slate-400"
+                    )}
+                  >
                     {formatTime(message.timestamp)}
                   </p>
                 </div>
@@ -229,7 +245,9 @@ const CustomChatWidget: React.FC<CustomChatWidgetProps> = ({
                 type="text"
                 value={currentMessage}
                 onChange={(e) => setCurrentMessage(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && !isLoading && handleSendMessage()}
+                onKeyPress={(e) =>
+                  e.key === "Enter" && !isLoading && handleSendMessage()
+                }
                 placeholder="Type your message..."
                 className="flex-1 p-2 bg-slate-800 border border-slate-600 rounded-lg text-slate-200 placeholder-slate-400 focus:border-cyan-400 focus:outline-none text-sm"
                 disabled={isLoading}

@@ -173,18 +173,22 @@ export default function HomePage() {
               onSearchModeChange={handleSearchModeChange}
               onSuggestionsStateChange={setSuggestionsState}
             />
-            <div className="mt-3 px-2">
-              <p className="text-xs text-slate-400 text-center leading-relaxed">
-                AI responses may contain inaccuracies. Please verify important
-                information. Your queries are processed to improve our service
-                and track environmental impact.
-              </p>
-            </div>
           </div>
         </div>
 
-        {/* Live AI Suggestions - positioned between SearchForm and Timeline */}
+        {/* Live AI Suggestions - positioned right below search input */}
         <LiveSuggestions suggestionsState={suggestionsState} query={query} />
+
+        {/* Disclaimer text - moved below suggestions */}
+        <div className="bg-slate-900/60 backdrop-blur-md">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 pb-4">
+            <p className="text-xs text-slate-400 text-center leading-relaxed">
+              AI responses may contain inaccuracies. Please verify important
+              information. Your queries are processed to improve our service and
+              track environmental impact.
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* Timeline + Footer */}

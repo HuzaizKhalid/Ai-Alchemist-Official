@@ -1,5 +1,5 @@
-﻿import { NextRequest, NextResponse } from 'next/server';
-import nodemailer from 'nodemailer';
+﻿import { NextRequest, NextResponse } from "next/server";
+import nodemailer from "nodemailer";
 
 export async function POST(request: NextRequest) {
   try {
@@ -7,20 +7,20 @@ export async function POST(request: NextRequest) {
     const { name, email, subject, message } = body;
 
     if (!name || !email || !subject || !message) {
-      return NextResponse.json({ error: 'Missing fields' }, { status: 400 });
+      return NextResponse.json({ error: "Missing fields" }, { status: 400 });
     }
 
-    console.log('=== CONTACT FORM SUBMISSION ===');
-    console.log('Name:', name);
-    console.log('Email:', email);
-    console.log('Subject:', subject);
-    console.log('Message:', message);
-    console.log('Admin Email: paulsemz17@gmail.com');
-    console.log('===============================');
+    console.log("=== CONTACT FORM SUBMISSION ===");
+    console.log("Name:", name);
+    console.log("Email:", email);
+    console.log("Subject:", subject);
+    console.log("Message:", message);
+    console.log("Admin Email: paulsemz17@gmail.com");
+    console.log("===============================");
 
     // Create email transporter using your Gmail credentials
     const transporter = nodemailer.createTransport({
-      service: 'gmail',
+      service: "gmail",
       auth: {
         user: process.env.EMAIL_USER, // shahhaseebahmadkhan9@gmail.com
         pass: process.env.EMAIL_APP_PASSWORD, // hokqbosxqflhvzzg
@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
     // Email content
     const mailOptions = {
       from: process.env.EMAIL_USER,
-      to: 'paulsemz17@gmail.com', // Admin email
+      to: "paulsemz17@gmail.com", // Admin email
       subject: `Contact Form: ${subject} - Alchemist AI`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9fafb;">
@@ -68,12 +68,19 @@ export async function POST(request: NextRequest) {
 
     // Send email
     await transporter.sendMail(mailOptions);
-    console.log(`✅ Email sent successfully to paulsemz17@gmail.com from ${name}`);
+    console.log(
+      `✅ Email sent successfully to paulsemz17@gmail.com from ${name}`
+    );
 
-    return NextResponse.json({ success: true, message: 'Message sent successfully!' });
-
+    return NextResponse.json({
+      success: true,
+      message: "Message sent successfully!",
+    });
   } catch (error) {
-    console.error('❌ Error sending email:', error);
-    return NextResponse.json({ error: 'Failed to send email. Please try again.' }, { status: 500 });
+    console.error("❌ Error sending email:", error);
+    return NextResponse.json(
+      { error: "Failed to send email. Please try again." },
+      { status: 500 }
+    );
   }
 }
