@@ -86,16 +86,24 @@ const CustomChatWidget: React.FC<CustomChatWidgetProps> = ({
 
   return (
     <>
-      {/* Chat Icon - Responsive positioning */}
-      <div
-        className="fixed z-50
-                      /* Mobile: Top left corner above main heading */
-                      top-36 left-6 
-                      /* Desktop: Traditional bottom-right */
-                      sm:bottom-6 sm:right-6 sm:left-auto sm:top-auto"
-      >
+      {/* Mobile: "24/7 Live support" text only */}
+      <div className="fixed z-50 top-32 left-6 sm:hidden">
         <button
           onClick={() => setIsOpen(!isOpen)}
+          data-chat-widget
+          className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 
+                     text-white px-3 py-2 rounded-lg shadow-lg transition-all duration-300 transform hover:scale-105
+                     text-sm font-medium"
+        >
+          💬 24/7 Live support
+        </button>
+      </div>
+
+      {/* Desktop: Traditional chat icon (hidden on mobile) */}
+      <div className="fixed z-50 bottom-6 right-6 hidden sm:block">
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          data-chat-widget
           className="relative group bg-gradient-to-br from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 
                      rounded-full p-2.5 shadow-2xl transition-all duration-300 transform hover:scale-105
                      ring-4 ring-blue-500/20 hover:ring-blue-500/40"

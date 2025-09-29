@@ -118,8 +118,9 @@ export function Header() {
 
       {/* Enhanced Glassy Header */}
       <header
-        className={`fixed w-full z-50 transition-all duration-300 ${showAnnouncementBar ? "top-12" : "top-0"
-          }`}
+        className={`fixed w-full z-50 transition-all duration-300 ${
+          showAnnouncementBar ? "top-12" : "top-0"
+        }`}
       >
         {/* Glassmorphism container */}
         <div className="backdrop-blur-2xl bg-black/10 border-b border-white/2 shadow-lg">
@@ -182,10 +183,30 @@ export function Header() {
           </div>
         </div>
 
-        {/* Total Users Badge - Right aligned, sticky below navbar */}
+        {/* Total Users Badge & Live Support - Right aligned, sticky below navbar */}
         <div className="backdrop-blur-xl bg-black/5 border-b border-white/5">
           <div className="max-w-6xl mx-auto px-6 lg:px-8 py-2">
-            <div className="flex justify-end">
+            <div className="flex justify-end sm:justify-between items-center gap-8 ">
+              {/* 24/7 Live Support Box - Desktop only */}
+              <div className="hidden sm:block">
+                <button
+                  onClick={() => {
+                    // Trigger the same chat functionality as SimpleChatWidget
+                    const chatWidget = document.querySelector(
+                      "[data-chat-widget]"
+                    ) as HTMLElement;
+                    if (chatWidget) {
+                      chatWidget.click();
+                    }
+                  }}
+                  className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 
+                             text-white px-4 py-2 rounded-lg shadow-lg transition-all duration-300 transform hover:scale-105
+                             text-sm font-medium border border-white/10"
+                >
+                  💬 24/7 Live support
+                </button>
+              </div>
+
               {totalUsers !== null && (
                 <span className="text-sm sm:text-base text-cyan-300 font-semibold bg-slate-800/80 px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg shadow-lg backdrop-blur-sm border border-white/10">
                   👥 Total Users: {totalUsers}
@@ -198,10 +219,11 @@ export function Header() {
 
       {/* Enhanced Glassy Slide-out Menu Panel */}
       <div
-        className={`fixed top-0 right-0 h-full w-80 z-50 transform transition-all duration-500 ease-out ${isMenuOpen && user
-          ? "translate-x-0 opacity-100"
-          : "translate-x-full opacity-0"
-          }`}
+        className={`fixed top-0 right-0 h-full w-80 z-50 transform transition-all duration-500 ease-out ${
+          isMenuOpen && user
+            ? "translate-x-0 opacity-100"
+            : "translate-x-full opacity-0"
+        }`}
       >
         {/* Glassmorphism sidebar */}
         <div className="h-full backdrop-blur-3xl bg-white/10 border-l border-white/20 shadow-2xl">
