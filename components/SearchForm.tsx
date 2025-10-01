@@ -498,7 +498,9 @@ const SearchForm = ({
       </div>
 
       {/* Search Form */}
-      <div className="relative px-4 py-3 rounded-xl bg-slate-800/85 ring-1 ring-slate-600/40 shadow-lg">
+      <div className={`relative px-4 py-3 bg-slate-800/85 ring-1 ring-slate-600/40 shadow-lg ${
+        showSuggestions && suggestions.length > 0 ? 'rounded-t-xl' : 'rounded-xl'
+      }`}>
         <form onSubmit={handleSearch}>
           <div className="relative">
             <TextareaAutosize

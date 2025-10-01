@@ -69,8 +69,8 @@ const SearchSuggestions: React.FC<SearchSuggestionsProps> = ({
   };
 
   return (
-    <div className="absolute top-full left-0 right-0 mt-1 z-[9999] animate-in fade-in slide-in-from-top-2 duration-200">
-      <div className="bg-slate-800/95 backdrop-blur-md border border-slate-600/50 rounded-xl shadow-2xl max-h-80 overflow-hidden">
+    <div className="absolute top-full left-0 right-0 z-[9999] animate-in fade-in slide-in-from-top-2 duration-200">
+      <div className="bg-slate-800/95 backdrop-blur-md border border-slate-600/50 border-t-0 rounded-b-xl shadow-2xl max-h-80 overflow-hidden">
         {/* Loading State */}
         {isLoading && (
           <div className="flex items-center justify-center py-4 px-6">
@@ -94,17 +94,6 @@ const SearchSuggestions: React.FC<SearchSuggestionsProps> = ({
         {/* Suggestions List */}
         {!isLoading && !error && suggestions.length > 0 && (
           <>
-            {/* Header */}
-            <div className="px-4 py-2 border-b border-slate-700/50 bg-slate-700/20">
-              <div className="flex items-center space-x-2 text-slate-400 text-xs">
-                <Search className="w-3 h-3" />
-                <span>Suggestions</span>
-                {query.length >= 2 && (
-                  <span className="text-slate-500">• based on "{query}"</span>
-                )}
-              </div>
-            </div>
-
             {/* Suggestions */}
             <div
               ref={listRef}

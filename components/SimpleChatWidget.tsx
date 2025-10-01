@@ -87,7 +87,7 @@ const CustomChatWidget: React.FC<CustomChatWidgetProps> = ({
   return (
     <>
       {/* Mobile: "24/7 Live support" text only */}
-      <div className="fixed z-50 top-32 left-6 sm:hidden">
+      <div className="fixed z-50 top-[100px] left-6 sm:hidden">
         <button
           onClick={() => setIsOpen(!isOpen)}
           data-chat-widget

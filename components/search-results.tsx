@@ -24,6 +24,8 @@ import {
 } from "recharts";
 import { Button } from "./ui/button";
 import { useSearch } from "@/context/searchContext";
+import { useState, useEffect } from "react";
+import ImageGallery from "./ImageGallery";
 
 // Interface remains the same for data compatibility
 export interface SearchResultsProps {
@@ -163,6 +165,34 @@ export function SearchResults({ results, isHome = false }: SearchResultsProps) {
   const { query, response, environmental, tokenUsage } = results;
   const { setSearchActive } = useSearch();
 
+  // Image search state
+  const [images, setImages] = useState<any[]>([]);
+  const [imagesLoading, setImagesLoading] = useState(false);
+
+  // Fetch images when component mounts or query changes
+  useEffect(() => {
+    const fetchImages = async () => {
+      if (!query) return;
+      
+      setImagesLoading(true);
+      try {
+        const response = await fetch(`/api/search/images?q=${encodeURIComponent(query)}`);
+        const data = await response.json();
+        
+        if (data.success && data.images) {
+          setImages(data.images);
+        }
+      } catch (error) {
+        console.error('Failed to fetch images:', error);
+        setImages([]);
+      } finally {
+        setImagesLoading(false);
+      }
+    };
+
+    fetchImages();
+  }, [query]);
+
   const tokenChartData = tokenUsage
     ? [
         { name: "Input", value: tokenUsage.inputTokens },
@@ -213,6 +243,13 @@ export function SearchResults({ results, isHome = false }: SearchResultsProps) {
                 </div>
               </div>
             </div>
+
+            {/* Image Gallery - Related Images */}
+            <ImageGallery 
+              images={images} 
+              query={query} 
+              isLoading={imagesLoading} 
+            />
 
             {/* Model Comparison Card */}
             <Card className="bg-slate-800/50 border border-slate-700 shadow-xl">

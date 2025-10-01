@@ -19,6 +19,9 @@ import {
   Leaf,
   ArrowRight,
   Contact,
+  Calendar,
+  ChevronDown,
+  ChevronRight,
 } from "lucide-react";
 import { usePathname } from "next/navigation";
 import Background from "./Background";
@@ -29,6 +32,7 @@ export function Header() {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showAnnouncementBar, setShowAnnouncementBar] = useState(true);
   const [totalUsers, setTotalUsers] = useState<number | null>(null);
+  const [showDashboardSubmenu, setShowDashboardSubmenu] = useState(false);
   const pathname = usePathname();
 
   // Fetch total users count
@@ -256,10 +260,39 @@ export function Header() {
                 <User className="w-5 h-5 text-emerald-400 drop-shadow-sm" />
                 <span className="drop-shadow-sm">Profile</span>
               </NavLink>
-              <NavLink href="/dashboard">
-                <LayoutDashboard className="w-5 h-5 text-emerald-400 drop-shadow-sm" />
-                <span className="drop-shadow-sm">Dashboard</span>
-              </NavLink>
+              
+              {/* Dashboard with Submenu */}
+              <div>
+                <button
+                  onClick={() => setShowDashboardSubmenu(!showDashboardSubmenu)}
+                  className="w-full flex items-center justify-between space-x-4 p-4 rounded-xl text-lg text-slate-200 hover:bg-white/10 hover:text-white hover:shadow-lg transition-all duration-300 hover:scale-[1.02] hover:backdrop-blur-md border border-transparent hover:border-white/20"
+                >
+                  <div className="flex items-center space-x-4">
+                    <LayoutDashboard className="w-5 h-5 text-emerald-400 drop-shadow-sm" />
+                    <span className="drop-shadow-sm">Dashboard</span>
+                  </div>
+                  {showDashboardSubmenu ? (
+                    <ChevronDown className="w-4 h-4" />
+                  ) : (
+                    <ChevronRight className="w-4 h-4" />
+                  )}
+                </button>
+                
+                {/* Dashboard Submenu */}
+                {showDashboardSubmenu && (
+                  <div className="ml-6 mt-2 space-y-2">
+                    <NavLink href="/dashboard">
+                      <LayoutDashboard className="w-4 h-4 text-emerald-400 drop-shadow-sm" />
+                      <span className="drop-shadow-sm text-base">Overview</span>
+                    </NavLink>
+                    <NavLink href="/dashboard/calendar">
+                      <Calendar className="w-4 h-4 text-emerald-400 drop-shadow-sm" />
+                      <span className="drop-shadow-sm text-base">Calendar</span>
+                    </NavLink>
+                  </div>
+                )}
+              </div>
+              
               <NavLink href="/vote">
                 <DollarSign className="w-5 h-5 text-emerald-400 drop-shadow-sm" />
                 <span className="drop-shadow-sm">Vote</span>

@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Search, Sparkles, TrendingUp } from "lucide-react";
+import { Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface LiveSuggestionsProps {
@@ -56,8 +56,8 @@ const LiveSuggestions: React.FC<LiveSuggestionsProps> = ({
     <div className="w-full max-w-4xl mx-auto px-4 sm:px-6">
       {/* AI Suggestions */}
       {suggestionsState.showSuggestions && (
-        <div className="mb-4">
-          <div className="bg-slate-800/95 backdrop-blur-lg border border-slate-700/50 rounded-xl shadow-2xl overflow-hidden">
+        <div className="-mt-8 relative z-10">
+          <div className="bg-slate-800/95 backdrop-blur-lg border border-slate-700/50 border-t-0 rounded-b-xl shadow-2xl overflow-hidden">
             {suggestionsState.isLoadingSuggestions ? (
               <div className="p-4">
                 <div className="flex items-center justify-center gap-2">
@@ -75,25 +75,15 @@ const LiveSuggestions: React.FC<LiveSuggestionsProps> = ({
               </div>
             ) : suggestionsState.suggestions.length > 0 ? (
               <>
-                <div className="p-3 border-b border-slate-700/50">
-                  <div className="flex items-center gap-2">
-                    <Sparkles className="w-4 h-4 text-cyan-400" />
-                    <span className="text-sm font-medium text-slate-300">
-                      AI Suggestions
-                    </span>
-                    <div className="flex-1" />
-                    <TrendingUp className="w-4 h-4 text-slate-500" />
-                  </div>
-                </div>
                 <div className="max-h-80 overflow-y-auto">
                   {suggestionsState.suggestions.map((suggestion, index) => (
                     <div
                       key={index}
                       className={cn(
-                        "flex items-center gap-3 p-3 transition-all cursor-pointer border-b border-slate-700/30 last:border-b-0",
-                        "hover:bg-slate-700/50 hover:border-slate-600/50",
+                        "flex items-center gap-3 p-3 transition-all cursor-pointer",
+                        "hover:bg-slate-700/50",
                         suggestionsState.selectedIndex === index &&
-                          "bg-slate-700/70 border-cyan-500/30"
+                          "bg-slate-700/70"
                       )}
                       onClick={() =>
                         suggestionsState.handleSuggestionClick(suggestion)
