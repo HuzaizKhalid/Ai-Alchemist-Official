@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { ExternalLink, X, ChevronLeft, ChevronRight, ImageIcon } from 'lucide-react';
 
@@ -24,12 +24,22 @@ export default function ImageGallery({ images, query, isLoading }: ImageGalleryP
   const [selectedImage, setSelectedImage] = useState<ImageData | null>(null);
   const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [showGallery, setShowGallery] = useState(false);
 
   const handleImageError = (imageId: string) => {
     setImageErrors(prev => new Set(prev).add(imageId));
   };
 
   const filteredImages = images.filter(img => !imageErrors.has(img.id));
+
+  // Only show gallery when we have images and they're not loading
+  useEffect(() => {
+    if (!isLoading && images.length > 0) {
+      setShowGallery(true);
+    } else if (isLoading) {
+      setShowGallery(false);
+    }
+  }, [isLoading, images.length]);
 
   const handlePrevious = () => {
     setSelectedIndex((prev) => (prev > 0 ? prev - 1 : filteredImages.length - 1));
@@ -60,7 +70,8 @@ export default function ImageGallery({ images, query, isLoading }: ImageGalleryP
     );
   }
 
-  if (filteredImages.length === 0) {
+  // Only show gallery if we have images and showGallery is true
+  if (!showGallery || filteredImages.length === 0) {
     return null;
   }
 

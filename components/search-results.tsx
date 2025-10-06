@@ -10,6 +10,8 @@ import {
   Leaf,
   User,
   Zap,
+  Share2,
+  Check,
 } from "lucide-react";
 import Image from "next/image";
 import ReactMarkdown from "react-markdown";
@@ -26,6 +28,7 @@ import { Button } from "./ui/button";
 import { useSearch } from "@/context/searchContext";
 import { useState, useEffect } from "react";
 import ImageGallery from "./ImageGallery";
+import { useToast } from "@/hooks/use-toast";
 
 // Interface remains the same for data compatibility
 export interface SearchResultsProps {
@@ -164,10 +167,16 @@ export function SearchResults({ results, isHome = false }: SearchResultsProps) {
 
   const { query, response, environmental, tokenUsage } = results;
   const { setSearchActive } = useSearch();
+  const { toast } = useToast();
 
   // Image search state
   const [images, setImages] = useState<any[]>([]);
   const [imagesLoading, setImagesLoading] = useState(false);
+  
+  // Share functionality state
+  const [isShared, setIsShared] = useState(false);
+  const [shareUrl, setShareUrl] = useState('');
+  const [shareCount, setShareCount] = useState(0);
 
   // Fetch images when component mounts or query changes
   useEffect(() => {
@@ -192,6 +201,139 @@ export function SearchResults({ results, isHome = false }: SearchResultsProps) {
 
     fetchImages();
   }, [query]);
+
+  // Generate share URL when component mounts
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const baseUrl = window.location.origin;
+      const searchId = btoa(encodeURIComponent(query + Date.now())).slice(0, 10); // Create unique ID
+      const shareableUrl = `${baseUrl}/shared/${searchId}?q=${encodeURIComponent(query)}`;
+      setShareUrl(shareableUrl);
+    }
+  }, [query]);
+
+  // Share functionality
+  const handleShare = async () => {
+    try {
+      // First, store the search data in the database
+      const shareResponse = await fetch('/api/share', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          query,
+          response,
+          environmental,
+          tokenUsage
+        }),
+      });
+
+      if (shareResponse.ok) {
+        const shareData = await shareResponse.json();
+        const shareableUrl = shareData.shareUrl;
+        
+        // Copy the share URL to clipboard with improved error handling
+        try {
+          // Ensure document has focus for clipboard access
+          if (!document.hasFocus()) {
+            window.focus();
+            await new Promise(resolve => setTimeout(resolve, 100));
+          }
+          
+          await navigator.clipboard.writeText(shareableUrl);
+        } catch (clipboardError) {
+          console.log('Modern clipboard failed, using fallback:', clipboardError);
+          
+          // Fallback method for clipboard
+          const textArea = document.createElement('textarea');
+          textArea.value = shareableUrl;
+          textArea.style.position = 'fixed';
+          textArea.style.left = '-999999px';
+          textArea.style.top = '-999999px';
+          document.body.appendChild(textArea);
+          textArea.focus();
+          textArea.select();
+          document.execCommand('copy');
+          document.body.removeChild(textArea);
+        }
+        setShareUrl(shareableUrl);
+        setIsShared(true);
+        
+        // Show success toast
+        toast({
+          title: "Link copied!",
+          description: "Share link has been copied to your clipboard.",
+        });
+        
+        // Increment local share count for UI feedback
+        setShareCount(prev => prev + 1);
+        
+        // Reset the share state after 3 seconds
+        setTimeout(() => {
+          setIsShared(false);
+        }, 3000);
+      } else {
+        throw new Error('Failed to create shareable link');
+      }
+    } catch (error) {
+      console.error('Failed to share:', error);
+      
+      // Fallback to simple URL sharing
+      try {
+        const fallbackUrl = `${window.location.origin}/shared/fallback?q=${encodeURIComponent(query)}`;
+        
+        try {
+          // Ensure document has focus for clipboard access
+          if (!document.hasFocus()) {
+            window.focus();
+            await new Promise(resolve => setTimeout(resolve, 100));
+          }
+          
+          await navigator.clipboard.writeText(fallbackUrl);
+        } catch (clipboardError) {
+          console.log('Fallback clipboard failed, using execCommand:', clipboardError);
+          
+          // Final fallback method
+          const textArea = document.createElement('textarea');
+          textArea.value = fallbackUrl;
+          textArea.style.position = 'fixed';
+          textArea.style.left = '-999999px';
+          textArea.style.top = '-999999px';
+          document.body.appendChild(textArea);
+          textArea.focus();
+          textArea.select();
+          document.execCommand('copy');
+          document.body.removeChild(textArea);
+        }
+        
+        setShareUrl(fallbackUrl);
+        setIsShared(true);
+        
+        toast({
+          title: "Link copied!",
+          description: "Share link has been copied to your clipboard.",
+        });
+        
+        setTimeout(() => {
+          setIsShared(false);
+        }, 3000);
+      } catch (clipboardError) {
+        console.error('Failed to copy to clipboard:', clipboardError);
+        // Final fallback for browsers that don't support clipboard API
+        const textArea = document.createElement('textarea');
+        textArea.value = shareUrl || window.location.href;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        setIsShared(true);
+        setTimeout(() => {
+          setIsShared(false);
+        }, 3000);
+      }
+    }
+  };
 
   const tokenChartData = tokenUsage
     ? [
@@ -237,9 +379,51 @@ export function SearchResults({ results, isHome = false }: SearchResultsProps) {
               <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-full bg-gradient-to-r from-emerald-500 to-blue-500 flex items-center justify-center flex-shrink-0">
                 <Bot className="w-4 h-4 lg:w-5 lg:h-5 text-white" />
               </div>
-              <div className="flex-1 min-w-0 bg-slate-800/30 border border-slate-700/80 rounded-xl p-3 lg:p-4">
-                <div className="prose prose-sm lg:prose prose-invert max-w-none text-white/80">
-                  <ReactMarkdown>{response}</ReactMarkdown>
+              <div className="flex-1 min-w-0">
+                <div className="bg-slate-800/30 border border-slate-700/80 rounded-xl p-3 lg:p-4">
+                  <div className="prose prose-sm lg:prose prose-invert max-w-none text-white/80">
+                    <ReactMarkdown>{response}</ReactMarkdown>
+                  </div>
+                </div>
+                
+                {/* Share Button */}
+                <div className="mt-3 flex justify-end">
+                  <div className="flex items-center gap-2">
+                    {shareCount > 0 && (
+                      <span className="text-xs text-slate-500 bg-slate-800/50 px-2 py-1 rounded-full">
+                        Shared {shareCount} time{shareCount !== 1 ? 's' : ''}
+                      </span>
+                    )}
+                    <Button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.currentTarget.focus();
+                        handleShare();
+                      }}
+                      variant="ghost"
+                      size="sm"
+                      className={`
+                        flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300 text-sm font-medium
+                        ${isShared 
+                          ? 'bg-green-500/20 text-green-400 border border-green-500/40 shadow-lg shadow-green-500/20' 
+                          : 'bg-slate-700/70 text-slate-300 border border-slate-600/50 hover:bg-slate-600/70 hover:text-white hover:border-slate-500/70 hover:shadow-lg hover:shadow-blue-500/10'
+                        }
+                      `}
+                      disabled={isShared}
+                    >
+                      {isShared ? (
+                        <>
+                          <Check className="w-4 h-4" />
+                          <span>Link copied. Paste to share</span>
+                        </>
+                      ) : (
+                        <>
+                          <Share2 className="w-4 h-4" />
+                          <span>Share</span>
+                        </>
+                      )}
+                    </Button>
+                  </div>
                 </div>
               </div>
             </div>
