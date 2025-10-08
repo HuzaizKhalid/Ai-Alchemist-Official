@@ -19,6 +19,7 @@ import Background from "@/components/Background";
 import { useRouter } from "next/navigation";
 
 interface CalendarUsageData {
+  
   year: number;
   yearlyStats: {
     totalSearches: number;

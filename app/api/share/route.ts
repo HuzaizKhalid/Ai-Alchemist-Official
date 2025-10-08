@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
     // Generate a unique share ID
     const shareId = btoa(encodeURIComponent(query + Date.now())).slice(0, 10);
 
-    const client = new MongoClient(MONGODB_URI);
+    const client = new MongoClient(MONGODB_URI!);
     await client.connect();
 
     const db = client.db('AiAlchemist');
@@ -39,7 +39,8 @@ export async function POST(request: NextRequest) {
     await collection.insertOne(sharedSearch);
     await client.close();
 
-    const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
+    // Get base URL and ensure it doesn't end with slash to prevent double slashes
+    const baseUrl = (process.env.NEXTAUTH_URL || process.env.VERCEL_URL || 'http://localhost:3000').replace(/\/$/, '');
     const shareUrl = `${baseUrl}/shared/${shareId}?q=${encodeURIComponent(query)}`;
 
     return NextResponse.json({
@@ -66,7 +67,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Share ID is required' }, { status: 400 });
     }
 
-    const client = new MongoClient(MONGODB_URI);
+    const client = new MongoClient(MONGODB_URI!);
     await client.connect();
 
     const db = client.db('AiAlchemist');

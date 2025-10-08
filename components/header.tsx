@@ -122,8 +122,8 @@ export function Header() {
 
       {/* Enhanced Glassy Header */}
       <header
-        className={`fixed w-full z-50 transition-all duration-300 ${
-          showAnnouncementBar ? "top-12" : "top-0"
+        className={`fixed w-full z-50 transition-all duration-300 top-0 ${
+          showAnnouncementBar ? "pt-12" : ""
         }`}
       >
         {/* Glassmorphism container */}
@@ -190,8 +190,8 @@ export function Header() {
         {/* Total Users Badge & Live Support - Right aligned, sticky below navbar */}
         <div className="backdrop-blur-xl bg-black/5 border-b border-white/5">
           <div className="max-w-6xl mx-auto px-6 lg:px-8 py-2">
-            <div className="flex justify-end sm:justify-between items-center gap-8 ">
-              {/* 24/7 Live Support Box - Desktop only */}
+            <div className="flex justify-end sm:justify-between items-center gap-2 sm:gap-8">
+              {/* 24/7 Live Support Box - Desktop only to avoid duplication with SimpleChatWidget */}
               <div className="hidden sm:block">
                 <button
                   onClick={() => {
@@ -204,8 +204,8 @@ export function Header() {
                     }
                   }}
                   className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 
-                             text-white px-4 py-2 rounded-lg shadow-lg transition-all duration-300 transform hover:scale-105
-                             text-sm font-medium border border-white/10"
+                             text-white rounded-lg shadow-lg transition-all duration-300 transform hover:scale-105
+                             text-sm font-medium border border-white/10 px-3 py-1.5 sm:px-4 sm:py-2"
                 >
                   💬 24/7 Live support
                 </button>
@@ -260,7 +260,7 @@ export function Header() {
                 <User className="w-5 h-5 text-emerald-400 drop-shadow-sm" />
                 <span className="drop-shadow-sm">Profile</span>
               </NavLink>
-              
+
               {/* Dashboard with Submenu */}
               <div>
                 <button
@@ -277,7 +277,7 @@ export function Header() {
                     <ChevronRight className="w-4 h-4" />
                   )}
                 </button>
-                
+
                 {/* Dashboard Submenu */}
                 {showDashboardSubmenu && (
                   <div className="ml-6 mt-2 space-y-2">
@@ -292,7 +292,7 @@ export function Header() {
                   </div>
                 )}
               </div>
-              
+
               <NavLink href="/vote">
                 <DollarSign className="w-5 h-5 text-emerald-400 drop-shadow-sm" />
                 <span className="drop-shadow-sm">Vote</span>

@@ -10,8 +10,6 @@ import {
   Leaf,
   User,
   Zap,
-  Share2,
-  Check,
 } from "lucide-react";
 import Image from "next/image";
 import ReactMarkdown from "react-markdown";
@@ -27,8 +25,6 @@ import {
 import { Button } from "./ui/button";
 import { useSearch } from "@/context/searchContext";
 import { useState, useEffect } from "react";
-import ImageGallery from "./ImageGallery";
-import { useToast } from "@/hooks/use-toast";
 
 // Interface remains the same for data compatibility
 export interface SearchResultsProps {
@@ -167,173 +163,44 @@ export function SearchResults({ results, isHome = false }: SearchResultsProps) {
 
   const { query, response, environmental, tokenUsage } = results;
   const { setSearchActive } = useSearch();
-  const { toast } = useToast();
 
-  // Image search state
-  const [images, setImages] = useState<any[]>([]);
-  const [imagesLoading, setImagesLoading] = useState(false);
-  
-  // Share functionality state
-  const [isShared, setIsShared] = useState(false);
-  const [shareUrl, setShareUrl] = useState('');
-  const [shareCount, setShareCount] = useState(0);
+  // Dynamic stats state
+  const [currentTime, setCurrentTime] = useState(new Date());
+  const [totalPrompts, setTotalPrompts] = useState<number | null>(null);
 
-  // Fetch images when component mounts or query changes
+  // Update current time every minute
   useEffect(() => {
-    const fetchImages = async () => {
-      if (!query) return;
-      
-      setImagesLoading(true);
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 60000); // Update every minute
+
+    return () => clearInterval(timer);
+  }, []);
+
+  // Fetch total prompts statistics
+  useEffect(() => {
+    const fetchTotalStats = async () => {
       try {
-        const response = await fetch(`/api/search/images?q=${encodeURIComponent(query)}`);
+        const response = await fetch('/api/total-prompts');
         const data = await response.json();
         
-        if (data.success && data.images) {
-          setImages(data.images);
+        if (data.success) {
+          setTotalPrompts(data.totalPrompts);
         }
       } catch (error) {
-        console.error('Failed to fetch images:', error);
-        setImages([]);
-      } finally {
-        setImagesLoading(false);
+        console.error('Failed to fetch total stats:', error);
+        // Set fallback value
+        setTotalPrompts(1247);
       }
     };
 
-    fetchImages();
-  }, [query]);
-
-  // Generate share URL when component mounts
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const baseUrl = window.location.origin;
-      const searchId = btoa(encodeURIComponent(query + Date.now())).slice(0, 10); // Create unique ID
-      const shareableUrl = `${baseUrl}/shared/${searchId}?q=${encodeURIComponent(query)}`;
-      setShareUrl(shareableUrl);
-    }
-  }, [query]);
-
-  // Share functionality
-  const handleShare = async () => {
-    try {
-      // First, store the search data in the database
-      const shareResponse = await fetch('/api/share', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          query,
-          response,
-          environmental,
-          tokenUsage
-        }),
-      });
-
-      if (shareResponse.ok) {
-        const shareData = await shareResponse.json();
-        const shareableUrl = shareData.shareUrl;
-        
-        // Copy the share URL to clipboard with improved error handling
-        try {
-          // Ensure document has focus for clipboard access
-          if (!document.hasFocus()) {
-            window.focus();
-            await new Promise(resolve => setTimeout(resolve, 100));
-          }
-          
-          await navigator.clipboard.writeText(shareableUrl);
-        } catch (clipboardError) {
-          console.log('Modern clipboard failed, using fallback:', clipboardError);
-          
-          // Fallback method for clipboard
-          const textArea = document.createElement('textarea');
-          textArea.value = shareableUrl;
-          textArea.style.position = 'fixed';
-          textArea.style.left = '-999999px';
-          textArea.style.top = '-999999px';
-          document.body.appendChild(textArea);
-          textArea.focus();
-          textArea.select();
-          document.execCommand('copy');
-          document.body.removeChild(textArea);
-        }
-        setShareUrl(shareableUrl);
-        setIsShared(true);
-        
-        // Show success toast
-        toast({
-          title: "Link copied!",
-          description: "Share link has been copied to your clipboard.",
-        });
-        
-        // Increment local share count for UI feedback
-        setShareCount(prev => prev + 1);
-        
-        // Reset the share state after 3 seconds
-        setTimeout(() => {
-          setIsShared(false);
-        }, 3000);
-      } else {
-        throw new Error('Failed to create shareable link');
-      }
-    } catch (error) {
-      console.error('Failed to share:', error);
-      
-      // Fallback to simple URL sharing
-      try {
-        const fallbackUrl = `${window.location.origin}/shared/fallback?q=${encodeURIComponent(query)}`;
-        
-        try {
-          // Ensure document has focus for clipboard access
-          if (!document.hasFocus()) {
-            window.focus();
-            await new Promise(resolve => setTimeout(resolve, 100));
-          }
-          
-          await navigator.clipboard.writeText(fallbackUrl);
-        } catch (clipboardError) {
-          console.log('Fallback clipboard failed, using execCommand:', clipboardError);
-          
-          // Final fallback method
-          const textArea = document.createElement('textarea');
-          textArea.value = fallbackUrl;
-          textArea.style.position = 'fixed';
-          textArea.style.left = '-999999px';
-          textArea.style.top = '-999999px';
-          document.body.appendChild(textArea);
-          textArea.focus();
-          textArea.select();
-          document.execCommand('copy');
-          document.body.removeChild(textArea);
-        }
-        
-        setShareUrl(fallbackUrl);
-        setIsShared(true);
-        
-        toast({
-          title: "Link copied!",
-          description: "Share link has been copied to your clipboard.",
-        });
-        
-        setTimeout(() => {
-          setIsShared(false);
-        }, 3000);
-      } catch (clipboardError) {
-        console.error('Failed to copy to clipboard:', clipboardError);
-        // Final fallback for browsers that don't support clipboard API
-        const textArea = document.createElement('textarea');
-        textArea.value = shareUrl || window.location.href;
-        document.body.appendChild(textArea);
-        textArea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textArea);
-        setIsShared(true);
-        setTimeout(() => {
-          setIsShared(false);
-        }, 3000);
-      }
-    }
-  };
+    fetchTotalStats();
+    
+    // Refresh stats every 5 minutes
+    const statsInterval = setInterval(fetchTotalStats, 5 * 60 * 1000);
+    
+    return () => clearInterval(statsInterval);
+  }, []);
 
   const tokenChartData = tokenUsage
     ? [
@@ -379,61 +246,12 @@ export function SearchResults({ results, isHome = false }: SearchResultsProps) {
               <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-full bg-gradient-to-r from-emerald-500 to-blue-500 flex items-center justify-center flex-shrink-0">
                 <Bot className="w-4 h-4 lg:w-5 lg:h-5 text-white" />
               </div>
-              <div className="flex-1 min-w-0">
-                <div className="bg-slate-800/30 border border-slate-700/80 rounded-xl p-3 lg:p-4">
-                  <div className="prose prose-sm lg:prose prose-invert max-w-none text-white/80">
-                    <ReactMarkdown>{response}</ReactMarkdown>
-                  </div>
-                </div>
-                
-                {/* Share Button */}
-                <div className="mt-3 flex justify-end">
-                  <div className="flex items-center gap-2">
-                    {shareCount > 0 && (
-                      <span className="text-xs text-slate-500 bg-slate-800/50 px-2 py-1 rounded-full">
-                        Shared {shareCount} time{shareCount !== 1 ? 's' : ''}
-                      </span>
-                    )}
-                    <Button
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.currentTarget.focus();
-                        handleShare();
-                      }}
-                      variant="ghost"
-                      size="sm"
-                      className={`
-                        flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300 text-sm font-medium
-                        ${isShared 
-                          ? 'bg-green-500/20 text-green-400 border border-green-500/40 shadow-lg shadow-green-500/20' 
-                          : 'bg-slate-700/70 text-slate-300 border border-slate-600/50 hover:bg-slate-600/70 hover:text-white hover:border-slate-500/70 hover:shadow-lg hover:shadow-blue-500/10'
-                        }
-                      `}
-                      disabled={isShared}
-                    >
-                      {isShared ? (
-                        <>
-                          <Check className="w-4 h-4" />
-                          <span>Link copied. Paste to share</span>
-                        </>
-                      ) : (
-                        <>
-                          <Share2 className="w-4 h-4" />
-                          <span>Share</span>
-                        </>
-                      )}
-                    </Button>
-                  </div>
+              <div className="flex-1 min-w-0 bg-slate-800/30 border border-slate-700/80 rounded-xl p-3 lg:p-4">
+                <div className="prose prose-sm lg:prose prose-invert max-w-none text-white/80">
+                  <ReactMarkdown>{response}</ReactMarkdown>
                 </div>
               </div>
             </div>
-
-            {/* Image Gallery - Related Images */}
-            <ImageGallery 
-              images={images} 
-              query={query} 
-              isLoading={imagesLoading} 
-            />
 
             {/* Model Comparison Card */}
             <Card className="bg-slate-800/50 border border-slate-700 shadow-xl">
@@ -559,36 +377,36 @@ export function SearchResults({ results, isHome = false }: SearchResultsProps) {
             {/* Global Averages Section */}
             <section className="bg-gray-900 text-white py-8 lg:py-12 px-4 lg:px-6 text-center rounded-xl">
               <h2 className="text-xl lg:text-3xl font-bold mb-4">
-                Global Average resource usage (For single person daily)
+                Prompt totals As of {currentTime.toLocaleTimeString('en-US', { 
+                  hour: 'numeric', 
+                  minute: '2-digit',
+                  hour12: true 
+                })} for all users
               </h2>
-              <p className="text-sm lg:text-lg text-gray-300 mb-6">
-                Daily global averages for AI computational resources and
-                environmental impact.
-              </p>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 lg:gap-8 max-w-2xl mx-auto">
                 <div>
                   <h3 className="text-2xl lg:text-4xl font-bold text-blue-400">
-                    1,000
+                    {totalPrompts !== null ? totalPrompts.toLocaleString() : '...'}
                   </h3>
                   <p className="text-gray-400 text-xs lg:text-base">
-                    Gallons Water/Day
+                    Total Text Prompts
                   </p>
                 </div>
                 <div>
                   <h3 className="text-2xl lg:text-4xl font-bold text-green-400">
-                    8.2
+                    Video
                   </h3>
                   <p className="text-gray-400 text-xs lg:text-base">
-                    kWh Electricity/Day
+                    Coming soon
                   </p>
                 </div>
                 <div>
                   <h3 className="text-2xl lg:text-4xl font-bold text-yellow-400">
-                    13-19
+                    Audio
                   </h3>
                   <p className="text-gray-400 text-xs lg:text-base">
-                    kg CO₂/Day
+                    Coming soon
                   </p>
                 </div>
               </div>

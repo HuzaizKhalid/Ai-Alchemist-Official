@@ -1,0 +1,16 @@
+{
+  "functions": {
+    "app/api/**": {
+      "maxDuration": 30
+    }
+  },
+  "env": {
+    "NEXTAUTH_URL": "https://ai-alchemist-official-ljdcfi5dk-kenny-peters-projects.vercel.app"
+  },
+  "rewrites": [
+    {
+      "source": "/shared/:shareId",
+      "destination": "/shared/:shareId"
+    }
+  ]
+}

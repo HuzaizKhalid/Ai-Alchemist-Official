@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { X, Send } from "lucide-react";
 import Image from "next/image";
 
@@ -24,12 +24,30 @@ const CustomChatWidget: React.FC<CustomChatWidgetProps> = ({
   const [showForm, setShowForm] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [hasAnnouncementBar, setHasAnnouncementBar] = useState(true);
   const [formData, setFormData] = useState<FormData>({
     name: "",
     email: "",
     subject: "",
     message: "",
   });
+
+  // Check if announcement bar is visible
+  useEffect(() => {
+    const checkAnnouncementBar = () => {
+      const announcementBar = document.querySelector('[class*="z-\\[60\\]"]');
+      setHasAnnouncementBar(!!announcementBar);
+    };
+
+    // Initial check
+    checkAnnouncementBar();
+
+    // Set up observer to watch for changes
+    const observer = new MutationObserver(checkAnnouncementBar);
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    return () => observer.disconnect();
+  }, []);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -86,8 +104,12 @@ const CustomChatWidget: React.FC<CustomChatWidgetProps> = ({
 
   return (
     <>
-      {/* Mobile: "24/7 Live support" text only */}
-      <div className="fixed z-50 top-[100px] left-6 sm:hidden">
+      {/* Mobile: "24/7 Live support" text only - positioned to align with header content */}
+      <div 
+        className={`fixed z-50 left-6 sm:hidden transition-all duration-300 ${
+          hasAnnouncementBar ? 'top-[150px]' : 'top-[102px]'
+        }`}
+      >
         <button
           onClick={() => setIsOpen(!isOpen)}
           data-chat-widget
