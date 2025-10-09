@@ -25,6 +25,7 @@ import {
 import { Button } from "./ui/button";
 import { useSearch } from "@/context/searchContext";
 import { useState, useEffect } from "react";
+import ImageGallery from "./ImageGallery";
 
 // Interface remains the same for data compatibility
 export interface SearchResultsProps {
@@ -138,7 +139,7 @@ const ImpactBarChart = ({
                   dataKey="value"
                   position="top"
                   style={{ fill: "#e2e8f0", fontSize: "10px" }}
-                  formatter={(value: number) => value.toFixed(4)}
+                  formatter={(value: any) => typeof value === 'number' ? value.toFixed(4) : value}
                 />
               </Bar>
             </BarChart>
@@ -167,6 +168,10 @@ export function SearchResults({ results, isHome = false }: SearchResultsProps) {
   // Dynamic stats state
   const [currentTime, setCurrentTime] = useState(new Date());
   const [totalPrompts, setTotalPrompts] = useState<number | null>(null);
+
+  // Image search state
+  const [images, setImages] = useState<any[]>([]);
+  const [imagesLoading, setImagesLoading] = useState(false);
 
   // Update current time every minute
   useEffect(() => {
@@ -201,6 +206,32 @@ export function SearchResults({ results, isHome = false }: SearchResultsProps) {
     
     return () => clearInterval(statsInterval);
   }, []);
+
+  // Fetch images when component mounts or query changes
+  useEffect(() => {
+    const fetchImages = async () => {
+      if (!query) return;
+
+      setImagesLoading(true);
+      try {
+        const response = await fetch(
+          `/api/search/images?q=${encodeURIComponent(query)}`
+        );
+        const data = await response.json();
+
+        if (data.success && data.images) {
+          setImages(data.images);
+        }
+      } catch (error) {
+        console.error("Failed to fetch images:", error);
+        setImages([]);
+      } finally {
+        setImagesLoading(false);
+      }
+    };
+
+    fetchImages();
+  }, [query]);
 
   const tokenChartData = tokenUsage
     ? [
@@ -252,6 +283,13 @@ export function SearchResults({ results, isHome = false }: SearchResultsProps) {
                 </div>
               </div>
             </div>
+
+            {/* Image Gallery - Related Images */}
+            <ImageGallery
+              images={images}
+              query={query}
+              isLoading={imagesLoading}
+            />
 
             {/* Model Comparison Card */}
             <Card className="bg-slate-800/50 border border-slate-700 shadow-xl">
