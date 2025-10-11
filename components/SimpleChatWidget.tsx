@@ -25,6 +25,7 @@ const CustomChatWidget: React.FC<CustomChatWidgetProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [hasAnnouncementBar, setHasAnnouncementBar] = useState(true);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [formData, setFormData] = useState<FormData>({
     name: "",
     email: "",
@@ -44,6 +45,23 @@ const CustomChatWidget: React.FC<CustomChatWidgetProps> = ({
 
     // Set up observer to watch for changes
     const observer = new MutationObserver(checkAnnouncementBar);
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    return () => observer.disconnect();
+  }, []);
+
+  // Check if mobile menu is open by detecting the backdrop
+  useEffect(() => {
+    const checkMobileMenu = () => {
+      const backdrop = document.querySelector('.fixed.inset-0.bg-black\\/60.backdrop-blur-sm.z-40');
+      setIsMobileMenuOpen(!!backdrop);
+    };
+
+    // Initial check
+    checkMobileMenu();
+
+    // Set up observer to watch for mobile menu backdrop
+    const observer = new MutationObserver(checkMobileMenu);
     observer.observe(document.body, { childList: true, subtree: true });
 
     return () => observer.disconnect();
@@ -104,22 +122,24 @@ const CustomChatWidget: React.FC<CustomChatWidgetProps> = ({
 
   return (
     <>
-      {/* Mobile: "24/7 Live support" text only - positioned to align with header content */}
-      <div 
-        className={`fixed z-50 left-6 sm:hidden transition-all duration-300 ${
-          hasAnnouncementBar ? 'top-[150px]' : 'top-[102px]'
-        }`}
-      >
-        <button
-          onClick={() => setIsOpen(!isOpen)}
-          data-chat-widget
-          className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 
-                     text-white px-3 py-2 rounded-lg shadow-lg transition-all duration-300 transform hover:scale-105
-                     text-sm font-medium"
+      {/* Mobile: "Live support" text only - positioned to align with header content */}
+      {!isMobileMenuOpen && (
+        <div
+          className={`fixed z-50 left-6 sm:hidden transition-all duration-300 ${
+            hasAnnouncementBar ? "top-[150px]" : "top-[102px]"
+          }`}
         >
-          💬 24/7 Live support
-        </button>
-      </div>
+          <button
+            onClick={() => setIsOpen(!isOpen)}
+            data-chat-widget
+            className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 
+                       text-white rounded-lg shadow-lg transition-all duration-300 transform hover:scale-105
+                       text-sm font-medium border border-white/10 px-3 py-1.5"
+          >
+            💬 Live support
+          </button>
+        </div>
+      )}
 
       {/* Desktop: Traditional chat icon (hidden on mobile) */}
       <div className="fixed z-50 bottom-6 right-6 hidden sm:block">

@@ -1,8 +1,14 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import Image from 'next/image';
-import { ExternalLink, X, ChevronLeft, ChevronRight, ImageIcon } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import Image from "next/image";
+import {
+  ExternalLink,
+  X,
+  ChevronLeft,
+  ChevronRight,
+  ImageIcon,
+} from "lucide-react";
 
 interface ImageData {
   id: string;
@@ -20,17 +26,21 @@ interface ImageGalleryProps {
   isLoading?: boolean;
 }
 
-export default function ImageGallery({ images, query, isLoading }: ImageGalleryProps) {
+export default function ImageGallery({
+  images,
+  query,
+  isLoading,
+}: ImageGalleryProps) {
   const [selectedImage, setSelectedImage] = useState<ImageData | null>(null);
   const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [showGallery, setShowGallery] = useState(false);
 
   const handleImageError = (imageId: string) => {
-    setImageErrors(prev => new Set(prev).add(imageId));
+    setImageErrors((prev) => new Set(prev).add(imageId));
   };
 
-  const filteredImages = images.filter(img => !imageErrors.has(img.id));
+  const filteredImages = images.filter((img) => !imageErrors.has(img.id));
 
   // Only show gallery when we have images and they're not loading
   useEffect(() => {
@@ -42,13 +52,25 @@ export default function ImageGallery({ images, query, isLoading }: ImageGalleryP
   }, [isLoading, images.length]);
 
   const handlePrevious = () => {
-    setSelectedIndex((prev) => (prev > 0 ? prev - 1 : filteredImages.length - 1));
-    setSelectedImage(filteredImages[selectedIndex > 0 ? selectedIndex - 1 : filteredImages.length - 1]);
+    setSelectedIndex((prev) =>
+      prev > 0 ? prev - 1 : filteredImages.length - 1
+    );
+    setSelectedImage(
+      filteredImages[
+        selectedIndex > 0 ? selectedIndex - 1 : filteredImages.length - 1
+      ]
+    );
   };
 
   const handleNext = () => {
-    setSelectedIndex((prev) => (prev < filteredImages.length - 1 ? prev + 1 : 0));
-    setSelectedImage(filteredImages[selectedIndex < filteredImages.length - 1 ? selectedIndex + 1 : 0]);
+    setSelectedIndex((prev) =>
+      prev < filteredImages.length - 1 ? prev + 1 : 0
+    );
+    setSelectedImage(
+      filteredImages[
+        selectedIndex < filteredImages.length - 1 ? selectedIndex + 1 : 0
+      ]
+    );
   };
 
   if (isLoading) {
@@ -63,7 +85,10 @@ export default function ImageGallery({ images, query, isLoading }: ImageGalleryP
         </div>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
           {[...Array(6)].map((_, i) => (
-            <div key={i} className="aspect-video bg-slate-700/50 rounded-lg animate-pulse"></div>
+            <div
+              key={i}
+              className="aspect-video bg-slate-700/50 rounded-lg animate-pulse"
+            ></div>
           ))}
         </div>
       </div>
@@ -84,7 +109,7 @@ export default function ImageGallery({ images, query, isLoading }: ImageGalleryP
           {filteredImages.length} results
         </span>
       </h3>
-      
+
       {/* Image Grid */}
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
         {filteredImages.map((image, index) => (
@@ -122,8 +147,12 @@ export default function ImageGallery({ images, query, isLoading }: ImageGalleryP
       {/* Image Sources Attribution */}
       <div className="text-xs text-slate-400 flex items-center justify-between border-t border-slate-700/50 pt-4">
         <span>Images provided by {filteredImages[0]?.source}</span>
-        <a 
-          href={filteredImages[0]?.source === 'Unsplash' ? 'https://unsplash.com' : 'https://pixabay.com'}
+        <a
+          href={
+            filteredImages[0]?.source === "Unsplash"
+              ? "https://unsplash.com"
+              : "https://pixabay.com"
+          }
           target="_blank"
           rel="noopener noreferrer"
           className="hover:text-blue-400 transition-colors flex items-center space-x-1"
@@ -185,7 +214,9 @@ export default function ImageGallery({ images, query, isLoading }: ImageGalleryP
             {/* Image info */}
             <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent p-6">
               <div className="text-white">
-                <p className="text-lg font-medium mb-2 max-w-4xl">{selectedImage.alt}</p>
+                <p className="text-lg font-medium mb-2 max-w-4xl">
+                  {selectedImage.alt}
+                </p>
                 <div className="flex items-center justify-between text-sm text-slate-300">
                   <span>Photo by {selectedImage.photographer}</span>
                   <a

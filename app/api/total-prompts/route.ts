@@ -6,8 +6,8 @@ const MONGODB_URI = process.env.MONGODB_URI as string;
 export async function GET(request: NextRequest) {
   if (!MONGODB_URI) {
     return NextResponse.json(
-      { 
-        success: false, 
+      {
+        success: false,
         error: "MongoDB URI not configured",
         totalPrompts: 0,
         totalWaterUsage: 0,
@@ -17,26 +17,26 @@ export async function GET(request: NextRequest) {
   }
 
   let client: MongoClient | null = null;
-  
+
   try {
     client = new MongoClient(MONGODB_URI);
     await client.connect();
-    
+
     const db = client.db("AiAlchemist");
-    
+
     // Try different possible collection names for search history
     const possibleCollections = [
-      "histories", 
-      "searches", 
+      "histories",
+      "searches",
       "shared_searches",
-      "search_history", 
-      "user_searches", 
-      "prompts"
+      "search_history",
+      "user_searches",
+      "prompts",
     ];
-    
+
     let totalPrompts = 0;
     let totalWaterUsage = 0;
-    
+
     // Check each collection and sum up the counts
     for (const collectionName of possibleCollections) {
       try {
@@ -44,51 +44,56 @@ export async function GET(request: NextRequest) {
         const count = await collection.countDocuments();
         console.log(`Collection ${collectionName}: ${count} documents`);
         totalPrompts += count;
-        
+
         // Try to get actual water usage if environmental data exists
-        const searchesWithEnvData = await collection.find(
-          { "environmental.waterUsage": { $exists: true } }
-        ).toArray();
-        
+        const searchesWithEnvData = await collection
+          .find({ "environmental.waterUsage": { $exists: true } })
+          .toArray();
+
         if (searchesWithEnvData.length > 0) {
           const actualWaterUsage = searchesWithEnvData.reduce(
-            (sum, search) => sum + (search.environmental?.waterUsage || 0), 
+            (sum, search) => sum + (search.environmental?.waterUsage || 0),
             0
           );
           totalWaterUsage += actualWaterUsage;
         }
       } catch (collectionError) {
-        console.log(`Collection ${collectionName} doesn't exist or error:`, collectionError instanceof Error ? collectionError.message : 'Unknown error');
+        console.log(
+          `Collection ${collectionName} doesn't exist or error:`,
+          collectionError instanceof Error
+            ? collectionError.message
+            : "Unknown error"
+        );
       }
     }
-    
+
     // If no actual water usage data, calculate based on average
     if (totalWaterUsage === 0) {
       const averageWaterPerSearch = 2.9; // mL
       totalWaterUsage = totalPrompts * averageWaterPerSearch;
     }
-    
-    console.log(`Total prompts found: ${totalPrompts}, Total water usage: ${totalWaterUsage}mL`);
-    
+
+    console.log(
+      `Total prompts found: ${totalPrompts}, Total water usage: ${totalWaterUsage}mL`
+    );
+
     return NextResponse.json({
       success: true,
       totalPrompts,
       totalWaterUsage,
       timestamp: new Date().toISOString(),
     });
-    
   } catch (error) {
     console.error("Error fetching total prompts:", error);
-    
+
     // Return fallback data instead of error to keep UI working
     return NextResponse.json({
       success: true, // Changed to true to keep UI functional
       totalPrompts: 1500, // Sample fallback data - higher number
       totalWaterUsage: 4350.0, // Sample fallback water usage
       timestamp: new Date().toISOString(),
-      note: "Using fallback data due to connection issue"
+      note: "Using fallback data due to connection issue",
     });
-    
   } finally {
     if (client) {
       try {

@@ -139,7 +139,9 @@ const ImpactBarChart = ({
                   dataKey="value"
                   position="top"
                   style={{ fill: "#e2e8f0", fontSize: "10px" }}
-                  formatter={(value: any) => typeof value === 'number' ? value.toFixed(4) : value}
+                  formatter={(value: any) =>
+                    typeof value === "number" ? value.toFixed(4) : value
+                  }
                 />
               </Bar>
             </BarChart>
@@ -167,7 +169,7 @@ export function SearchResults({ results, isHome = false }: SearchResultsProps) {
 
   // Dynamic stats state
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [totalPrompts, setTotalPrompts] = useState<number | null>(null);
+  const [dailyPrompts, setDailyPrompts] = useState<number | null>(null);
 
   // Image search state
   const [images, setImages] = useState<any[]>([]);
@@ -182,28 +184,43 @@ export function SearchResults({ results, isHome = false }: SearchResultsProps) {
     return () => clearInterval(timer);
   }, []);
 
-  // Fetch total prompts statistics
+  // Fetch daily prompts statistics
   useEffect(() => {
-    const fetchTotalStats = async () => {
+    const fetchDailyStats = async () => {
       try {
-        const response = await fetch('/api/total-prompts');
+        const response = await fetch("/api/daily-prompts");
         const data = await response.json();
-        
+
         if (data.success) {
-          setTotalPrompts(data.totalPrompts);
+          setDailyPrompts(data.dailyPrompts);
         }
       } catch (error) {
-        console.error('Failed to fetch total stats:', error);
+        console.error("Failed to fetch daily stats:", error);
         // Set fallback value
-        setTotalPrompts(1247);
+        setDailyPrompts(45);
       }
     };
 
-    fetchTotalStats();
-    
+    fetchDailyStats();
+
     // Refresh stats every 5 minutes
-    const statsInterval = setInterval(fetchTotalStats, 5 * 60 * 1000);
-    
+    const statsInterval = setInterval(fetchDailyStats, 5 * 60 * 1000);
+
+    // Check if it's a new day and refresh data
+    const checkNewDay = () => {
+      const now = new Date();
+      const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0);
+      const timeUntilMidnight = midnight.getTime() - now.getTime();
+      
+      setTimeout(() => {
+        fetchDailyStats(); // Refresh at midnight
+        // Set up daily refresh
+        setInterval(fetchDailyStats, 24 * 60 * 60 * 1000);
+      }, timeUntilMidnight);
+    };
+
+    checkNewDay();
+
     return () => clearInterval(statsInterval);
   }, []);
 
@@ -412,23 +429,33 @@ export function SearchResults({ results, isHome = false }: SearchResultsProps) {
               />
             </div>
 
-            {/* Global Averages Section */}
+            {/* Daily Stats Section */}
             <section className="bg-gray-900 text-white py-8 lg:py-12 px-4 lg:px-6 text-center rounded-xl">
               <h2 className="text-xl lg:text-3xl font-bold mb-4">
-                Prompt totals As of {currentTime.toLocaleTimeString('en-US', { 
-                  hour: 'numeric', 
-                  minute: '2-digit',
-                  hour12: true 
-                })} for all users
+                Daily prompts as of{" "}
+                {currentTime.toLocaleDateString("en-US", {
+                  weekday: "long",
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}{" "}
+                at{" "}
+                {currentTime.toLocaleTimeString("en-US", {
+                  hour: "numeric",
+                  minute: "2-digit",
+                  hour12: true,
+                })}
               </h2>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 lg:gap-8 max-w-2xl mx-auto">
                 <div>
                   <h3 className="text-2xl lg:text-4xl font-bold text-blue-400">
-                    {totalPrompts !== null ? totalPrompts.toLocaleString() : '...'}
+                    {dailyPrompts !== null
+                      ? dailyPrompts.toLocaleString()
+                      : "..."}
                   </h3>
                   <p className="text-gray-400 text-xs lg:text-base">
-                    Total Text Prompts
+                    Text Prompts Today
                   </p>
                 </div>
                 <div>
@@ -442,6 +469,14 @@ export function SearchResults({ results, isHome = false }: SearchResultsProps) {
                 <div>
                   <h3 className="text-2xl lg:text-4xl font-bold text-yellow-400">
                     Audio
+                  </h3>
+                  <p className="text-gray-400 text-xs lg:text-base">
+                    Coming soon
+                  </p>
+                </div>
+                <div>
+                  <h3 className="text-2xl lg:text-4xl font-bold text-red-400">
+                    Image
                   </h3>
                   <p className="text-gray-400 text-xs lg:text-base">
                     Coming soon
