@@ -53,7 +53,9 @@ const CustomChatWidget: React.FC<CustomChatWidgetProps> = ({
   // Check if mobile menu is open by detecting the backdrop
   useEffect(() => {
     const checkMobileMenu = () => {
-      const backdrop = document.querySelector('.fixed.inset-0.bg-black\\/60.backdrop-blur-sm.z-40');
+      const backdrop = document.querySelector(
+        ".fixed.inset-0.bg-black\\/60.backdrop-blur-sm.z-40"
+      );
       setIsMobileMenuOpen(!!backdrop);
     };
 
@@ -122,27 +124,10 @@ const CustomChatWidget: React.FC<CustomChatWidgetProps> = ({
 
   return (
     <>
-      {/* Mobile: "Live support" text only - positioned to align with header content */}
-      {!isMobileMenuOpen && (
-        <div
-          className={`fixed z-50 left-6 sm:hidden transition-all duration-300 ${
-            hasAnnouncementBar ? "top-[150px]" : "top-[102px]"
-          }`}
-        >
-          <button
-            onClick={() => setIsOpen(!isOpen)}
-            data-chat-widget
-            className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 
-                       text-white rounded-lg shadow-lg transition-all duration-300 transform hover:scale-105
-                       text-sm font-medium border border-white/10 px-3 py-1.5"
-          >
-            💬 Live support
-          </button>
-        </div>
-      )}
+      {/* Mobile button removed - only header button will trigger chat */}
 
       {/* Desktop: Traditional chat icon (hidden on mobile) */}
-      <div className="fixed z-50 bottom-6 right-6 hidden sm:block">
+      <div className="fixed z-50 bottom-6 right-6 hidden md:block">
         <button
           onClick={() => setIsOpen(!isOpen)}
           data-chat-widget

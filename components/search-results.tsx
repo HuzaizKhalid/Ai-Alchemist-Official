@@ -10,6 +10,9 @@ import {
   Leaf,
   User,
   Zap,
+  Share2,
+  Copy,
+  Check,
 } from "lucide-react";
 import Image from "next/image";
 import ReactMarkdown from "react-markdown";
@@ -26,6 +29,7 @@ import { Button } from "./ui/button";
 import { useSearch } from "@/context/searchContext";
 import { useState, useEffect } from "react";
 import ImageGallery from "./ImageGallery";
+import { CarbonOffsetCalculator } from "./CarbonOffsetCalculator";
 
 // Interface remains the same for data compatibility
 export interface SearchResultsProps {
@@ -175,6 +179,11 @@ export function SearchResults({ results, isHome = false }: SearchResultsProps) {
   const [images, setImages] = useState<any[]>([]);
   const [imagesLoading, setImagesLoading] = useState(false);
 
+  // Share functionality state
+  const [isSharing, setIsSharing] = useState(false);
+  const [shareUrl, setShareUrl] = useState("");
+  const [copied, setCopied] = useState(false);
+
   // Update current time every minute
   useEffect(() => {
     const timer = setInterval(() => {
@@ -209,9 +218,16 @@ export function SearchResults({ results, isHome = false }: SearchResultsProps) {
     // Check if it's a new day and refresh data
     const checkNewDay = () => {
       const now = new Date();
-      const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0);
+      const midnight = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate() + 1,
+        0,
+        0,
+        0
+      );
       const timeUntilMidnight = midnight.getTime() - now.getTime();
-      
+
       setTimeout(() => {
         fetchDailyStats(); // Refresh at midnight
         // Set up daily refresh
@@ -249,6 +265,48 @@ export function SearchResults({ results, isHome = false }: SearchResultsProps) {
 
     fetchImages();
   }, [query]);
+
+  // Share functionality
+  const handleShare = async () => {
+    setIsSharing(true);
+    try {
+      const res = await fetch("/api/share", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          query,
+          response,
+          environmental,
+          tokenUsage,
+        }),
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        setShareUrl(data.shareUrl);
+        // Auto-copy to clipboard
+        await navigator.clipboard.writeText(data.shareUrl);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      } else {
+        alert("Failed to create share link");
+      }
+    } catch (error) {
+      console.error("Share error:", error);
+      alert("Failed to create share link");
+    }
+    setIsSharing(false);
+  };
+
+  const copyToClipboard = async () => {
+    if (shareUrl) {
+      await navigator.clipboard.writeText(shareUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
 
   const tokenChartData = tokenUsage
     ? [
@@ -299,6 +357,12 @@ export function SearchResults({ results, isHome = false }: SearchResultsProps) {
                   <ReactMarkdown>{response}</ReactMarkdown>
                 </div>
               </div>
+            </div>
+
+            {/* Share Actions */}
+            {/* Share Actions - Bottom Center of Chat */}
+            <div className="w-full flex justify-center mt-6">
+              {/* Share button moved to daily stats section */}
             </div>
 
             {/* Image Gallery - Related Images */}
@@ -429,6 +493,11 @@ export function SearchResults({ results, isHome = false }: SearchResultsProps) {
               />
             </div>
 
+            {/* Carbon Offset Calculator */}
+            <CarbonOffsetCalculator
+              carbonEmissions={environmental.carbonEmissions}
+            />
+
             {/* Daily Stats Section */}
             <section className="bg-gray-900 text-white py-8 lg:py-12 px-4 lg:px-6 text-center rounded-xl">
               <h2 className="text-xl lg:text-3xl font-bold mb-4">
@@ -485,6 +554,50 @@ export function SearchResults({ results, isHome = false }: SearchResultsProps) {
               </div>
             </section>
           </div>
+        </div>
+
+        {/* Share Button - Bottom Center of Main Container */}
+        <div className="mt-8 flex justify-center">
+          {shareUrl ? (
+            <div className="flex items-center gap-3 bg-slate-800/30 border border-slate-700 rounded-lg p-3">
+              <input
+                type="text"
+                value={shareUrl}
+                readOnly
+                className="bg-slate-900/50 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white/90 min-w-0"
+                style={{ width: 280 }}
+              />
+              <Button
+                onClick={copyToClipboard}
+                variant="outline"
+                size="sm"
+                className="bg-blue-500/20 border-blue-500/50 hover:bg-blue-500/30 text-blue-300 hover:text-blue-200 flex items-center gap-2"
+              >
+                {copied ? (
+                  <>
+                    <Check className="w-4 h-4" />
+                    Copied!
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-4 h-4" />
+                    Copy
+                  </>
+                )}
+              </Button>
+            </div>
+          ) : (
+            <Button
+              onClick={handleShare}
+              disabled={isSharing}
+              variant="outline"
+              size="default"
+              className="bg-blue-500/20 border-blue-500/50 hover:bg-blue-500/30 text-blue-300 hover:text-blue-200 flex items-center gap-2 px-6 py-3"
+            >
+              <Share2 className="w-5 h-5" />
+              {isSharing ? "Creating link..." : "Share this conversation"}
+            </Button>
+          )}
         </div>
       </div>
 

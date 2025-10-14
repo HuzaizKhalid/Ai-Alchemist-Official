@@ -190,9 +190,9 @@ export function Header() {
         {/* Total Users Badge & Live Support - Right aligned, sticky below navbar */}
         <div className="backdrop-blur-xl bg-black/5 border-b border-white/5">
           <div className="max-w-6xl mx-auto px-6 lg:px-8 py-2">
-            <div className="flex justify-end sm:justify-between items-center gap-2 sm:gap-8">
-              {/* 24/7 Live Support Box - Desktop only to avoid duplication with SimpleChatWidget */}
-              <div className="hidden sm:block">
+            <div className="flex justify-between items-center gap-2 sm:gap-8">
+              {/* 24/7 Live Support Box - Left side on mobile, left side on desktop */}
+              <div className="flex order-1">
                 <button
                   onClick={() => {
                     // Trigger the same chat functionality as SimpleChatWidget
@@ -212,7 +212,7 @@ export function Header() {
               </div>
 
               {totalUsers !== null && (
-                <span className="text-sm sm:text-base text-cyan-300 font-semibold bg-slate-800/80 px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg shadow-lg backdrop-blur-sm border border-white/10">
+                <span className="text-sm sm:text-base text-cyan-300 font-semibold bg-slate-800/80 px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg shadow-lg backdrop-blur-sm border border-white/10 order-2">
                   👥 Total Users: {totalUsers}
                 </span>
               )}
