@@ -91,3 +91,126 @@ export function getModelDisplayName(modelName: string): string {
   }
   return displayNames[key] || "GPT-4o"
 }
+
+// CO₂ Offset Calculator Functions based on your specifications
+export interface CO2OffsetCalculations {
+  treesRequired: number;
+  offsetCost: number; // USD
+  carMilesEquivalent: number;
+  carKilometersEquivalent: number;
+  dailyOffsetFromTree: number; // kg CO₂
+  treeLiftimeOffset: number; // tCO₂e
+}
+
+export function calculateCO2Offset(carbonEmissionsGrams: number): CO2OffsetCalculations {
+  // Convert grams to kg and tons
+  const emissionsKg = carbonEmissionsGrams / 1000;
+  const emissionsTons = emissionsKg / 1000;
+  
+  // Constants from your specifications
+  const TREE_LIFETIME_OFFSET = 4.6; // tCO₂e per tree over lifetime (200 years)
+  const OFFSET_COST_PER_TON = 14; // USD per tCO₂e (average of nature-based and agriculture projects)
+  const MILES_PER_KG_CO2 = 0.4; // kg CO₂e per mile driven
+  const KM_PER_KG_CO2 = 0.248; // kg CO₂e per km driven
+  const DAILY_OFFSET_RATE = 0.063; // kg CO₂ per day (converted from 0.000063 tCO₂e)
+  
+  // Calculate trees required (always round up to nearest integer)
+  const treesRequired = Math.ceil(emissionsTons / TREE_LIFETIME_OFFSET);
+  
+  // Calculate offset cost
+  const offsetCost = emissionsTons * OFFSET_COST_PER_TON;
+  
+  // Calculate car equivalences
+  const carMilesEquivalent = Math.round(emissionsKg / MILES_PER_KG_CO2);
+  const carKilometersEquivalent = Math.round(emissionsKg / KM_PER_KG_CO2);
+  
+  return {
+    treesRequired,
+    offsetCost,
+    carMilesEquivalent,
+    carKilometersEquivalent,
+    dailyOffsetFromTree: DAILY_OFFSET_RATE,
+    treeLiftimeOffset: TREE_LIFETIME_OFFSET,
+  };
+}
+
+export interface TreeGrowthCalculation {
+  ageInDays: number;
+  cumulativeOffsetKg: number; // kg CO₂
+  cumulativeOffsetTons: number; // tCO₂e
+  yearlyAbsorption: number; // kg CO₂ per year (simplified to average)
+}
+
+export function calculateTreeGrowth(plantingDate: Date): TreeGrowthCalculation {
+  const now = new Date();
+  const ageInDays = Math.floor((now.getTime() - plantingDate.getTime()) / (1000 * 60 * 60 * 24));
+  
+  // Daily offset rate: 0.000063 tCO₂e per day
+  const DAILY_OFFSET_TONS = 0.000063;
+  const DAILY_OFFSET_KG = DAILY_OFFSET_TONS * 1000;
+  
+  const cumulativeOffsetTons = ageInDays * DAILY_OFFSET_TONS;
+  const cumulativeOffsetKg = cumulativeOffsetTons * 1000;
+  
+  // Average yearly absorption (simplified from your growth curve)
+  const YEARLY_ABSORPTION_KG = 23; // kg CO₂ per year for mature oak
+  
+  return {
+    ageInDays,
+    cumulativeOffsetKg,
+    cumulativeOffsetTons,
+    yearlyAbsorption: YEARLY_ABSORPTION_KG,
+  };
+}
+
+export interface UserTreeBalance {
+  totalUserOffset: number; // tCO₂e
+  netEmissions: number; // tCO₂e (negative = carbon negative)
+  isClimatePositive: boolean;
+  surplusOffset: number; // tCO₂e
+  surplusValue: number; // USD
+}
+
+export function calculateUserTreeBalance(
+  totalEmissionsTons: number, 
+  userTrees: Array<{ plantingDate: Date }>
+): UserTreeBalance {
+  // Calculate total offset from user trees
+  let totalUserOffset = 0;
+  
+  userTrees.forEach(tree => {
+    const growth = calculateTreeGrowth(tree.plantingDate);
+    totalUserOffset += growth.cumulativeOffsetTons;
+  });
+  
+  // Calculate net emissions
+  const netEmissions = totalEmissionsTons - totalUserOffset;
+  const isClimatePositive = netEmissions < 0;
+  
+  // Calculate surplus if climate positive
+  const surplusOffset = isClimatePositive ? Math.abs(netEmissions) : 0;
+  const surplusValue = surplusOffset * 14; // $14 per tCO₂e
+  
+  return {
+    totalUserOffset,
+    netEmissions,
+    isClimatePositive,
+    surplusOffset,
+    surplusValue,
+  };
+}
+
+export function formatTreeAge(ageInDays: number): string {
+  const years = Math.floor(ageInDays / 365);
+  const months = Math.floor((ageInDays % 365) / 30);
+  
+  if (years > 0) {
+    return `${years} year${years > 1 ? 's' : ''} and ${months} month${months !== 1 ? 's' : ''}`;
+  }
+  return `${months} month${months !== 1 ? 's' : ''}`;
+}
+
+export function getTreeGrowthMessage(ageInDays: number, cumulativeOffsetKg: number): string {
+  const ageString = formatTreeAge(ageInDays);
+  return `Your oak tree is now ${ageString} old — it has absorbed approximately ${cumulativeOffsetKg.toFixed(1)} kg of CO₂ so far! 🌱`;
+}

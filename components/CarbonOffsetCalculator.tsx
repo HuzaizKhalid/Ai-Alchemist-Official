@@ -16,6 +16,14 @@ import {
   Calendar,
   Award,
 } from "lucide-react";
+import { TreeGamification } from "@/components/TreeGamification";
+import { 
+  calculateCO2Offset, 
+  calculateTreeGrowth, 
+  calculateUserTreeBalance,
+  getTreeGrowthMessage,
+  formatTreeAge
+} from "@/lib/environmental-calculator";
 
 interface PlantedTree {
   id: string;
@@ -34,50 +42,42 @@ export function CarbonOffsetCalculator({
   const [userTrees, setUserTrees] = useState<PlantedTree[]>([]);
   const [newTreeDate, setNewTreeDate] = useState("");
   const [showAddTree, setShowAddTree] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  // Constants based on guidelines
-  const TREE_LIFETIME_OFFSET = 4.6; // tCO₂e per tree over lifetime
-  const OFFSET_COST_PER_TON = 14; // USD per tCO₂e
-  const DAILY_OFFSET_RATE = 0.000063; // tCO₂e per day
-  const MILES_PER_KG = 0.4; // kg CO₂e per mile
-  const KM_PER_KG = 0.248; // kg CO₂e per km
-
-  // Convert emissions to tons
+  // Calculate CO2 offset data using enhanced functions
+  const offsetData = calculateCO2Offset(carbonEmissions);
   const emissionsInTons = carbonEmissions / 1000;
 
-  // Calculate required trees
-  const treesRequired = Math.ceil(emissionsInTons / TREE_LIFETIME_OFFSET);
-
+  // Calculate user tree balance
+  const userTreesForBalance = userTrees.map(tree => ({ plantingDate: tree.plantingDate }));
+  const balanceData = calculateUserTreeBalance(emissionsInTons, userTreesForBalance);
+  
   // Calculate total user tree offset
   const totalUserOffset = userTrees.reduce(
     (sum, tree) => sum + tree.cumulativeOffset,
     0
   );
 
-  // Calculate net emissions
-  const netEmissions = emissionsInTons - totalUserOffset;
+  // Use balance data for net emissions and surplus
+  const netEmissions = balanceData.netEmissions;
+  const surplusValue = balanceData.surplusValue;
 
-  // Calculate costs
-  const offsetCost = emissionsInTons * OFFSET_COST_PER_TON;
-  const surplusValue =
-    netEmissions < 0 ? Math.abs(netEmissions) * OFFSET_COST_PER_TON : 0;
-
-  // Calculate car equivalences
-  const milesEquivalent = Math.round(carbonEmissions / MILES_PER_KG);
-  const kmEquivalent = Math.round(carbonEmissions / KM_PER_KG);
+  // Load trees from API
+  useEffect(() => {
+    loadTrees();
+  }, []);
 
   // Update tree ages and offsets
   useEffect(() => {
     const updateTrees = () => {
-      const now = new Date();
       setUserTrees((prev) =>
         prev.map((tree) => {
-          const ageInDays = Math.floor(
-            (now.getTime() - tree.plantingDate.getTime()) /
-              (1000 * 60 * 60 * 24)
-          );
-          const cumulativeOffset = ageInDays * DAILY_OFFSET_RATE;
-          return { ...tree, ageInDays, cumulativeOffset };
+          const growth = calculateTreeGrowth(tree.plantingDate);
+          return { 
+            ...tree, 
+            ageInDays: growth.ageInDays, 
+            cumulativeOffset: growth.cumulativeOffsetTons 
+          };
         })
       );
     };
@@ -88,33 +88,67 @@ export function CarbonOffsetCalculator({
     return () => clearInterval(interval);
   }, []);
 
-  const addTree = () => {
-    if (!newTreeDate) return;
-
-    const plantingDate = new Date(newTreeDate);
-    const now = new Date();
-    const ageInDays = Math.floor(
-      (now.getTime() - plantingDate.getTime()) / (1000 * 60 * 60 * 24)
-    );
-    const cumulativeOffset = ageInDays * DAILY_OFFSET_RATE;
-
-    const newTree: PlantedTree = {
-      id: Date.now().toString(),
-      plantingDate,
-      ageInDays,
-      cumulativeOffset,
-    };
-
-    setUserTrees((prev) => [...prev, newTree]);
-    setNewTreeDate("");
-    setShowAddTree(false);
+  const loadTrees = async () => {
+    try {
+      const response = await fetch("/api/trees", {
+        credentials: "include",
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setUserTrees(data.trees);
+      }
+    } catch (error) {
+      console.error("Failed to load trees:", error);
+    }
   };
 
-  const removeTree = (id: string) => {
-    setUserTrees((prev) => prev.filter((tree) => tree.id !== id));
+  const addTree = async () => {
+    if (!newTreeDate || loading) return;
+
+    setLoading(true);
+    try {
+      const response = await fetch("/api/trees", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({ plantingDate: newTreeDate }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setUserTrees((prev) => [...prev, data.tree]);
+        setNewTreeDate("");
+        setShowAddTree(false);
+      } else {
+        console.error("Failed to add tree");
+      }
+    } catch (error) {
+      console.error("Error adding tree:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const formatTreeAge = (days: number) => {
+  const removeTree = async (id: string) => {
+    try {
+      const response = await fetch(`/api/trees?id=${id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+
+      if (response.ok) {
+        setUserTrees((prev) => prev.filter((tree) => tree.id !== id));
+      } else {
+        console.error("Failed to remove tree");
+      }
+    } catch (error) {
+      console.error("Error removing tree:", error);
+    }
+  };
+
+  const formatTreeAgeShort = (days: number) => {
     const years = Math.floor(days / 365);
     const months = Math.floor((days % 365) / 30);
     if (years > 0) {
@@ -146,7 +180,7 @@ export function CarbonOffsetCalculator({
         color: "text-orange-400",
         icon: <Calculator className="w-5 h-5" />,
         message: `You need ${
-          treesRequired - userTrees.length
+          offsetData.treesRequired - userTrees.length
         } more trees to offset emissions.`,
       };
     }
@@ -186,27 +220,27 @@ export function CarbonOffsetCalculator({
           <div className="text-center p-3 bg-slate-900/30 rounded-lg">
             <TreePine className="w-6 h-6 text-green-400 mx-auto mb-1" />
             <p className="text-sm text-white/60">Trees Required</p>
-            <p className="text-lg font-bold text-white">{treesRequired}</p>
+            <p className="text-lg font-bold text-white">{offsetData.treesRequired}</p>
           </div>
           <div className="text-center p-3 bg-slate-900/30 rounded-lg">
             <DollarSign className="w-6 h-6 text-yellow-400 mx-auto mb-1" />
             <p className="text-sm text-white/60">Offset Cost</p>
             <p className="text-lg font-bold text-white">
-              ${offsetCost.toFixed(2)}
+              ${offsetData.offsetCost.toFixed(2)}
             </p>
           </div>
           <div className="text-center p-3 bg-slate-900/30 rounded-lg">
             <Car className="w-6 h-6 text-blue-400 mx-auto mb-1" />
             <p className="text-sm text-white/60">Miles Driven</p>
             <p className="text-lg font-bold text-white">
-              {milesEquivalent.toLocaleString()}
+              {offsetData.carMilesEquivalent.toLocaleString()}
             </p>
           </div>
           <div className="text-center p-3 bg-slate-900/30 rounded-lg">
             <Car className="w-6 h-6 text-purple-400 mx-auto mb-1" />
             <p className="text-sm text-white/60">Kilometers</p>
             <p className="text-lg font-bold text-white">
-              {kmEquivalent.toLocaleString()}
+              {offsetData.carKilometersEquivalent.toLocaleString()}
             </p>
           </div>
         </div>
@@ -244,8 +278,8 @@ export function CarbonOffsetCalculator({
                 />
               </div>
               <div className="flex items-end gap-2">
-                <Button onClick={addTree} size="sm" disabled={!newTreeDate}>
-                  Add
+                <Button onClick={addTree} size="sm" disabled={!newTreeDate || loading}>
+                  {loading ? "Adding..." : "Add"}
                 </Button>
                 <Button
                   onClick={() => setShowAddTree(false)}
@@ -269,7 +303,7 @@ export function CarbonOffsetCalculator({
                     <TreePine className="w-4 h-4 text-green-400" />
                     <div>
                       <p className="text-white text-sm font-medium">
-                        Oak Tree • {formatTreeAge(tree.ageInDays)} old
+                        Oak Tree • {formatTreeAgeShort(tree.ageInDays)} old
                       </p>
                       <p className="text-white/60 text-xs">
                         Offset: {(tree.cumulativeOffset * 1000).toFixed(1)} kg
@@ -299,6 +333,35 @@ export function CarbonOffsetCalculator({
           )}
         </div>
 
+        {/* Tree Growth Reminders */}
+        {userTrees.length > 0 && (
+          <div className="p-3 bg-gradient-to-r from-green-900/30 to-blue-900/30 rounded-lg border border-green-500/30">
+            <h5 className="text-green-400 font-semibold mb-2 flex items-center gap-2">
+              <TreePine className="w-4 h-4" />
+              Tree Growth Updates
+            </h5>
+            <div className="space-y-1 text-sm">
+              {userTrees.slice(0, 2).map((tree, index) => (
+                <p key={tree.id} className="text-white/80">
+                  Your oak tree #{index + 1} is now {formatTreeAge(tree.ageInDays)} old — 
+                  it has absorbed {(tree.cumulativeOffset * 1000).toFixed(1)} kg of CO₂ so far! 🌱
+                </p>
+              ))}
+              {userTrees.length > 2 && (
+                <p className="text-white/60 text-xs">
+                  ...and {userTrees.length - 2} more trees are growing! 🌳
+                </p>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Gamification Component */}
+        <TreeGamification 
+          userTrees={userTrees} 
+          onPlantTree={() => setShowAddTree(true)} 
+        />
+
         {/* Total Offset Summary */}
         <div className="p-3 bg-slate-900/50 rounded-lg">
           <div className="flex justify-between items-center">
@@ -317,6 +380,23 @@ export function CarbonOffsetCalculator({
               {netEmissions < 0 ? "-" : ""}
               {Math.abs(netEmissions * 1000).toFixed(1)} kg CO₂
             </span>
+          </div>
+          
+          {/* Car Equivalence */}
+          <div className="mt-3 pt-3 border-t border-slate-700">
+            <p className="text-white/60 text-sm mb-1">Equivalent to driving:</p>
+            <div className="grid grid-cols-2 gap-3 text-xs">
+              <div className="text-center">
+                <Car className="w-4 h-4 mx-auto mb-1 text-blue-400" />
+                <span className="text-white font-semibold">{offsetData.carMilesEquivalent.toLocaleString()}</span>
+                <span className="text-white/60 block">miles</span>
+              </div>
+              <div className="text-center">
+                <Car className="w-4 h-4 mx-auto mb-1 text-purple-400" />
+                <span className="text-white font-semibold">{offsetData.carKilometersEquivalent.toLocaleString()}</span>
+                <span className="text-white/60 block">kilometers</span>
+              </div>
+            </div>
           </div>
         </div>
       </CardContent>
