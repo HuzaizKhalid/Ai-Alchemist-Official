@@ -17,8 +17,7 @@ import {
 } from "lucide-react";
 import Background from "@/components/Background";
 import { useRouter } from "next/navigation";
-import { CarbonOffsetCalculator } from "@/components/CarbonOffsetCalculator";
-import { CO2RiskDashboard } from "@/components/CO2RiskDashboard";
+
 
 interface CalendarUsageData {
   year: number;
@@ -371,22 +370,7 @@ export default function CalendarPage() {
           </CardContent>
         </Card>
 
-        {/* CO2 Risk Dashboard - Prominent Display */}
-        <div className="mb-6">
-          <CO2RiskDashboard 
-            totalCO2Emissions={calendarData?.specificDateUsage?.totalCarbonEmissions || calendarData?.yearlyStats.totalCarbonEmissions || 0}
-            timeFilter="D"
-          />
-        </div>
-
-        {/* CO2 Offset Calculator - Full Width */}
-        <div className="mb-6">
-          <CarbonOffsetCalculator 
-            carbonEmissions={calendarData?.yearlyStats.totalCarbonEmissions || 0} 
-          />
-        </div>
-
-        {/* Calendar - 70% */}
+        {/* Calendar - Full Width */}
         <Card className="bg-slate-900/50 border-slate-700">
           <CardHeader>
             <div className="flex items-center justify-between">

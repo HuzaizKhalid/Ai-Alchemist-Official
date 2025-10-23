@@ -289,6 +289,12 @@ export function Header() {
                       <Calendar className="w-4 h-4 text-emerald-400 drop-shadow-sm" />
                       <span className="drop-shadow-sm text-base">Calendar</span>
                     </NavLink>
+                    <NavLink href="/dashboard/co2-offset">
+                      <TreePine className="w-4 h-4 text-emerald-400 drop-shadow-sm" />
+                      <span className="drop-shadow-sm text-base">
+                        CO₂ Offset Calculator
+                      </span>
+                    </NavLink>
                   </div>
                 )}
               </div>
