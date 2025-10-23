@@ -496,6 +496,7 @@ export function SearchResults({ results, isHome = false }: SearchResultsProps) {
             {/* Carbon Offset Calculator */}
             <CarbonOffsetCalculator
               carbonEmissions={environmental.carbonEmissions}
+              showExtendedInfo={false}
             />
 
             {/* Daily Stats Section */}

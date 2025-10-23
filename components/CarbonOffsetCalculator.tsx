@@ -34,10 +34,12 @@ interface PlantedTree {
 
 interface CarbonOffsetCalculatorProps {
   carbonEmissions: number; // in kg CO₂e
+  showExtendedInfo?: boolean; // Controls visibility of tree growth updates and car equivalence
 }
 
 export function CarbonOffsetCalculator({
   carbonEmissions,
+  showExtendedInfo = true,
 }: CarbonOffsetCalculatorProps) {
   const [userTrees, setUserTrees] = useState<PlantedTree[]>([]);
   const [newTreeDate, setNewTreeDate] = useState("");
@@ -362,7 +364,7 @@ export function CarbonOffsetCalculator({
         </div>
 
         {/* Tree Growth Reminders */}
-        {userTrees.length > 0 && (
+        {showExtendedInfo && userTrees.length > 0 && (
           <div className="p-3 bg-gradient-to-r from-green-900/30 to-blue-900/30 rounded-lg border border-green-500/30">
             <h5 className="text-green-400 font-semibold mb-2 flex items-center gap-2">
               <TreePine className="w-4 h-4" />
@@ -387,13 +389,16 @@ export function CarbonOffsetCalculator({
         )}
 
         {/* Gamification Component */}
-        <TreeGamification
-          userTrees={userTrees}
-          onPlantTree={() => setShowAddTree(true)}
-        />
+        {showExtendedInfo && (
+          <TreeGamification
+            userTrees={userTrees}
+            onPlantTree={() => setShowAddTree(true)}
+          />
+        )}
 
         {/* Total Offset Summary */}
-        <div className="p-3 bg-slate-900/50 rounded-lg">
+        {showExtendedInfo && (
+          <div className="p-3 bg-slate-900/50 rounded-lg">
           <div className="flex justify-between items-center">
             <span className="text-white/80">Total Tree Offset:</span>
             <span className="text-green-400 font-semibold">
@@ -413,26 +418,29 @@ export function CarbonOffsetCalculator({
           </div>
 
           {/* Car Equivalence */}
-          <div className="mt-3 pt-3 border-t border-slate-700">
-            <p className="text-white/60 text-sm mb-1">Equivalent to driving:</p>
-            <div className="grid grid-cols-2 gap-3 text-xs">
-              <div className="text-center">
-                <Car className="w-4 h-4 mx-auto mb-1 text-blue-400" />
-                <span className="text-white font-semibold">
-                  {offsetData.carMilesEquivalent.toLocaleString()}
-                </span>
-                <span className="text-white/60 block">miles</span>
-              </div>
-              <div className="text-center">
-                <Car className="w-4 h-4 mx-auto mb-1 text-purple-400" />
-                <span className="text-white font-semibold">
-                  {offsetData.carKilometersEquivalent.toLocaleString()}
-                </span>
-                <span className="text-white/60 block">kilometers</span>
+          {showExtendedInfo && (
+            <div className="mt-3 pt-3 border-t border-slate-700">
+              <p className="text-white/60 text-sm mb-1">Equivalent to driving:</p>
+              <div className="grid grid-cols-2 gap-3 text-xs">
+                <div className="text-center">
+                  <Car className="w-4 h-4 mx-auto mb-1 text-blue-400" />
+                  <span className="text-white font-semibold">
+                    {offsetData.carMilesEquivalent.toLocaleString()}
+                  </span>
+                  <span className="text-white/60 block">miles</span>
+                </div>
+                <div className="text-center">
+                  <Car className="w-4 h-4 mx-auto mb-1 text-purple-400" />
+                  <span className="text-white font-semibold">
+                    {offsetData.carKilometersEquivalent.toLocaleString()}
+                  </span>
+                  <span className="text-white/60 block">kilometers</span>
+                </div>
               </div>
             </div>
+          )}
           </div>
-        </div>
+        )}
       </CardContent>
     </Card>
   );
