@@ -100,6 +100,16 @@ export function HowItWorksTimeline() {
       <h2 className="text-3xl font-bold text-center mb-6 text-neutral-900 dark:text-white">
         How It Works
       </h2>
+      
+      {/* Disclaimer text */}
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 pb-6">
+        <p className="text-xs text-slate-400 text-center leading-relaxed">
+          AI responses may contain inaccuracies. Please verify important
+          information. Your queries are processed to improve our service and
+          track environmental impact.
+        </p>
+      </div>
+      
       <Timeline data={steps} />
     </div>
   );

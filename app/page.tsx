@@ -19,6 +19,7 @@ import Footer from "@/components/footer";
 import { SearchResults } from "@/components/search-results";
 import ConversationHistory from "@/components/ConversationHistory";
 import { toast } from "sonner";
+import { GreenSmokeEffect } from "@/components/GreenSmokeEffect";
 
 type SearchMode = "new" | "followup";
 
@@ -115,6 +116,9 @@ export default function HomePage() {
 
   return (
     <div className="bg-slate-900 text-slate-50">
+      {/* Green Smoke Effect */}
+      <GreenSmokeEffect />
+      
       <div className="relative min-h-screen flex flex-col pt-40 ">
         <Spotlight />
 
@@ -178,22 +182,15 @@ export default function HomePage() {
 
         {/* Live AI Suggestions - positioned right below search input */}
         <LiveSuggestions suggestionsState={suggestionsState} query={query} />
-
-        {/* Disclaimer text - moved below suggestions */}
-        <div className="bg-slate-900/60 backdrop-blur-md">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 pb-4">
-            <p className="text-xs text-slate-400 text-center leading-relaxed">
-              AI responses may contain inaccuracies. Please verify important
-              information. Your queries are processed to improve our service and
-              track environmental impact.
-            </p>
-          </div>
-        </div>
       </div>
 
-      {/* Timeline + Footer */}
+      {/* Timeline */}
       <div className="">
         <HowItWorksTimeline />
+      </div>
+
+      {/* Footer */}
+      <div className="">
         <Footer />
       </div>
 

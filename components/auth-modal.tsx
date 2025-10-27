@@ -2,7 +2,7 @@
 
 import type React from "react";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import {
   Dialog,
   DialogContent,
@@ -20,6 +20,8 @@ import {
   User,
   AlertCircle,
   CheckCircle2,
+  Check,
+  X,
 } from "lucide-react";
 import Image from "next/image";
 import { toast } from "sonner";
@@ -35,6 +37,21 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [apiKey, setApiKey] = useState("");
+
+  // Password validation state
+  const passwordValidation = useMemo(() => {
+    return {
+      minLength: password.length >= 8,
+      hasUppercase: /[A-Z]/.test(password),
+      hasLowercase: /[a-z]/.test(password),
+      hasNumber: /[0-9]/.test(password),
+      hasSpecialChar: /[!@#$%^&*(),.?":{}|<>]/.test(password),
+    };
+  }, [password]);
+
+  const isPasswordValid = Object.values(passwordValidation).every(Boolean);
+  const passwordStrength =
+    Object.values(passwordValidation).filter(Boolean).length;
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -301,6 +318,104 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
                     required
                   />
                 </div>
+
+                {/* Password Strength Indicator */}
+                {password && (
+                  <div className="space-y-2 mt-3">
+                    <div className="flex gap-1">
+                      {[1, 2, 3, 4, 5].map((level) => (
+                        <div
+                          key={level}
+                          className={`h-1 flex-1 rounded-full transition-all ${
+                            level <= passwordStrength
+                              ? passwordStrength <= 2
+                                ? "bg-red-500"
+                                : passwordStrength <= 3
+                                ? "bg-yellow-500"
+                                : passwordStrength <= 4
+                                ? "bg-blue-500"
+                                : "bg-green-500"
+                              : "bg-gray-300"
+                          }`}
+                        />
+                      ))}
+                    </div>
+
+                    {/* Password Requirements */}
+                    <div className="space-y-1 text-xs">
+                      <div
+                        className={`flex items-center gap-2 ${
+                          passwordValidation.minLength
+                            ? "text-green-600"
+                            : "text-gray-500"
+                        }`}
+                      >
+                        {passwordValidation.minLength ? (
+                          <Check className="h-3 w-3" />
+                        ) : (
+                          <X className="h-3 w-3" />
+                        )}
+                        <span>At least 8 characters</span>
+                      </div>
+                      <div
+                        className={`flex items-center gap-2 ${
+                          passwordValidation.hasUppercase
+                            ? "text-green-600"
+                            : "text-gray-500"
+                        }`}
+                      >
+                        {passwordValidation.hasUppercase ? (
+                          <Check className="h-3 w-3" />
+                        ) : (
+                          <X className="h-3 w-3" />
+                        )}
+                        <span>One uppercase letter</span>
+                      </div>
+                      <div
+                        className={`flex items-center gap-2 ${
+                          passwordValidation.hasLowercase
+                            ? "text-green-600"
+                            : "text-gray-500"
+                        }`}
+                      >
+                        {passwordValidation.hasLowercase ? (
+                          <Check className="h-3 w-3" />
+                        ) : (
+                          <X className="h-3 w-3" />
+                        )}
+                        <span>One lowercase letter</span>
+                      </div>
+                      <div
+                        className={`flex items-center gap-2 ${
+                          passwordValidation.hasNumber
+                            ? "text-green-600"
+                            : "text-gray-500"
+                        }`}
+                      >
+                        {passwordValidation.hasNumber ? (
+                          <Check className="h-3 w-3" />
+                        ) : (
+                          <X className="h-3 w-3" />
+                        )}
+                        <span>One number</span>
+                      </div>
+                      <div
+                        className={`flex items-center gap-2 ${
+                          passwordValidation.hasSpecialChar
+                            ? "text-green-600"
+                            : "text-gray-500"
+                        }`}
+                      >
+                        {passwordValidation.hasSpecialChar ? (
+                          <Check className="h-3 w-3" />
+                        ) : (
+                          <X className="h-3 w-3" />
+                        )}
+                        <span>One special character (!@#$%^&*...)</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div className="space-y-2">
@@ -321,7 +436,9 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
               <Button
                 type="submit"
                 className="w-full bg-green-600 hover:bg-green-700"
-                disabled={isLoading}
+                disabled={
+                  isLoading || (password.length > 0 && !isPasswordValid)
+                }
               >
                 {isLoading ? "Creating account..." : "Create Account"}
               </Button>

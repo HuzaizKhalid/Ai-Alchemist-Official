@@ -517,7 +517,7 @@ const SearchForm = ({
               placeholder={
                 searchMode === "followup"
                   ? "Ask a follow-up question based on your conversation history..."
-                  : `Ask anything about sustainability, science, or any topic... (${selectedTypeData.label.toLowerCase()} search)`
+                  : `What do you want to know? (${selectedTypeData.label.toLowerCase()} search)`
               }
               className={`w-full max-h-48 resize-none bg-transparent py-4 pl-6 pr-20 text-lg text-white placeholder:text-slate-400 focus:outline-none transition-all duration-300 ${
                 isFocused ? "placeholder:text-slate-500" : ""

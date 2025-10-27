@@ -399,46 +399,48 @@ export function CarbonOffsetCalculator({
         {/* Total Offset Summary */}
         {showExtendedInfo && (
           <div className="p-3 bg-slate-900/50 rounded-lg">
-          <div className="flex justify-between items-center">
-            <span className="text-white/80">Total Tree Offset:</span>
-            <span className="text-green-400 font-semibold">
-              {(totalUserOffset * 1000).toFixed(1)} kg CO₂
-            </span>
-          </div>
-          <div className="flex justify-between items-center mt-1">
-            <span className="text-white/80">Net Emissions:</span>
-            <span
-              className={
-                netEmissions < 0 ? "text-green-400" : "text-orange-400"
-              }
-            >
-              {netEmissions < 0 ? "-" : ""}
-              {Math.abs(netEmissions * 1000).toFixed(1)} kg CO₂
-            </span>
-          </div>
+            <div className="flex justify-between items-center">
+              <span className="text-white/80">Total Tree Offset:</span>
+              <span className="text-green-400 font-semibold">
+                {(totalUserOffset * 1000).toFixed(1)} kg CO₂
+              </span>
+            </div>
+            <div className="flex justify-between items-center mt-1">
+              <span className="text-white/80">Net Emissions:</span>
+              <span
+                className={
+                  netEmissions < 0 ? "text-green-400" : "text-orange-400"
+                }
+              >
+                {netEmissions < 0 ? "-" : ""}
+                {Math.abs(netEmissions * 1000).toFixed(1)} kg CO₂
+              </span>
+            </div>
 
-          {/* Car Equivalence */}
-          {showExtendedInfo && (
-            <div className="mt-3 pt-3 border-t border-slate-700">
-              <p className="text-white/60 text-sm mb-1">Equivalent to driving:</p>
-              <div className="grid grid-cols-2 gap-3 text-xs">
-                <div className="text-center">
-                  <Car className="w-4 h-4 mx-auto mb-1 text-blue-400" />
-                  <span className="text-white font-semibold">
-                    {offsetData.carMilesEquivalent.toLocaleString()}
-                  </span>
-                  <span className="text-white/60 block">miles</span>
-                </div>
-                <div className="text-center">
-                  <Car className="w-4 h-4 mx-auto mb-1 text-purple-400" />
-                  <span className="text-white font-semibold">
-                    {offsetData.carKilometersEquivalent.toLocaleString()}
-                  </span>
-                  <span className="text-white/60 block">kilometers</span>
+            {/* Car Equivalence */}
+            {showExtendedInfo && (
+              <div className="mt-3 pt-3 border-t border-slate-700">
+                <p className="text-white/60 text-sm mb-1">
+                  Equivalent to driving:
+                </p>
+                <div className="grid grid-cols-2 gap-3 text-xs">
+                  <div className="text-center">
+                    <Car className="w-4 h-4 mx-auto mb-1 text-blue-400" />
+                    <span className="text-white font-semibold">
+                      {offsetData.carMilesEquivalent.toLocaleString()}
+                    </span>
+                    <span className="text-white/60 block">miles</span>
+                  </div>
+                  <div className="text-center">
+                    <Car className="w-4 h-4 mx-auto mb-1 text-purple-400" />
+                    <span className="text-white font-semibold">
+                      {offsetData.carKilometersEquivalent.toLocaleString()}
+                    </span>
+                    <span className="text-white/60 block">kilometers</span>
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
           </div>
         )}
       </CardContent>

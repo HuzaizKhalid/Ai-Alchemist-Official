@@ -131,7 +131,7 @@ export default function PricingPage(): JSX.Element {
       id: "pro",
       name: "Pro",
       description: "For power users who need more",
-      price: 499, // $9.99
+      price: 1000, // $10.00
       interval: "month",
       price_id: "price_1S0mrYCdShX7Tzf1ZC0ppIDO",
     },
@@ -248,16 +248,18 @@ export default function PricingPage(): JSX.Element {
                     style={{ animationDelay: `${index * 0.1}s` }}
                   >
                     <Check
-                      className={`w-4 md:w-5 h-4 md:h-5 flex-shrink-0 ${feature.highlighted
-                        ? "text-emerald-400"
-                        : "text-blue-400"
-                        }`}
+                      className={`w-4 md:w-5 h-4 md:h-5 flex-shrink-0 ${
+                        feature.highlighted
+                          ? "text-emerald-400"
+                          : "text-blue-400"
+                      }`}
                     />
                     <span
-                      className={`text-xs md:text-sm ${feature.highlighted
-                        ? "text-emerald-300 font-medium"
-                        : "text-zinc-300"
-                        }`}
+                      className={`text-xs md:text-sm ${
+                        feature.highlighted
+                          ? "text-emerald-300 font-medium"
+                          : "text-zinc-300"
+                      }`}
                     >
                       {feature.text}
                     </span>
