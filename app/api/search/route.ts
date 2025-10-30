@@ -1,5 +1,5 @@
 import { openai } from "@ai-sdk/openai";
-import { generateText } from "ai";
+import { streamText } from "ai";
 import type { NextRequest } from "next/server";
 import { getUserFromRequest } from "@/lib/jwt";
 import { UserModel } from "@/lib/models/user";
@@ -9,7 +9,6 @@ import { searchSchema, sanitizeInput } from "@/lib/validation";
 import { RateLimiter } from "@/lib/rate-limiter";
 import { RATE_LIMITS } from "@/lib/config";
 import { logger } from "@/lib/logger";
-import { toast } from "sonner";
 import { ObjectId } from "mongodb";
 
 const freeRateLimiter = new RateLimiter(RATE_LIMITS.SEARCH_FREE_TIER);
@@ -96,64 +95,49 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Generate AI response with timeout
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+    // Generate AI response with streaming
+    const result = await streamText({
+      model: openai("gpt-4o"),
+      prompt: sanitizedQuery,
+      system:
+        "You are a helpful assistant focused on providing accurate, informative responses while being environmentally conscious. Keep responses concise but comprehensive.",
+      onFinish: async ({ text, usage }) => {
+        // Save to database after streaming completes
+        try {
+          const environmental = calculateEnvironmentalImpact(
+            "gpt-4o",
+            usage?.inputTokens || 0,
+            usage?.outputTokens || 0,
+            false
+          );
 
-    try {
-      const result = await generateText({
-        model: openai("gpt-4o"),
-        prompt: sanitizedQuery,
-        system:
-          "You are a helpful assistant focused on providing accurate, informative responses while being environmentally conscious. Keep responses concise but comprehensive.",
-        abortSignal: controller.signal,
-      });
+          await SearchModel.create({
+            userId: new ObjectId(user._id),
+            query: sanitizedQuery,
+            response: text,
+            modelUsed: "gpt-4o",
+            environmental,
+          });
 
-      clearTimeout(timeoutId);
+          await UserModel.incrementSearchCount(userPayload.userId);
 
-      // Calculate environmental impact using actual token counts
-      const environmental = calculateEnvironmentalImpact(
-        "gpt-4o",
-        result.usage?.inputTokens || 0,
-        result.usage?.outputTokens || 0,
-        false // Use inference-only footprint by default
-      );
+          logger.info("Search completed successfully", {
+            userId: user._id!.toString(),
+            tokenCount: environmental.tokenCount,
+          });
+        } catch (error) {
+          logger.error("Error saving search result", { error });
+        }
+      },
+    });
 
-      // Save search record
-      await SearchModel.create({
-        userId: new ObjectId(user._id),
-        query: sanitizedQuery,
-        response: result.text,
-        modelUsed: "gpt-4o",
-        environmental,
-      });
-
-      // Increment user's search count
-      await UserModel.incrementSearchCount(userPayload.userId);
-
-      logger.info("Search completed successfully", {
-        userId: user._id!.toString(),
-        tokenCount: environmental.tokenCount,
-      });
-
-      return Response.json({
-        query: sanitizedQuery,
-        response: result.text,
-        environmental,
-        tokenUsage: result.usage,
-      });
-    } catch (error) {
-      clearTimeout(timeoutId);
-
-      if (error instanceof Error && error.name === "AbortError") {
-        logger.warn("Search request timed out", {
-          userId: user._id!.toString(),
-        });
-        return Response.json({ error: "Request timed out" }, { status: 408 });
-      }
-
-      throw error;
-    }
+    // Return streaming response
+    return result.toTextStreamResponse({
+      headers: {
+        "X-User-Id": user._id!.toString(),
+        "X-Model": "gpt-4o",
+      },
+    });
   } catch (error) {
     logger.error("Search API error", { error });
 

@@ -44,11 +44,33 @@ export default function HomePage() {
     }
     if (!query.trim()) return;
     setIsLoading(true);
+
+    // Initialize results with query and empty response for streaming
+    const currentQuery = query;
+    setSearchResults({
+      query: currentQuery,
+      response: "",
+      environmental: {
+        energyUsage: 0,
+        carbonEmissions: 0,
+        waterUsage: 0,
+        efficiency: "medium" as const,
+        tokenCount: 0,
+      },
+      tokenUsage: {
+        inputTokens: 0,
+        outputTokens: 0,
+        totalTokens: 0,
+      },
+    });
+    setSearchActive(true);
+    setSearchMode("new");
+
     try {
       const response = await fetch("/api/search", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query }),
+        body: JSON.stringify({ query: currentQuery }),
       });
 
       if (!response.ok) {
@@ -72,18 +94,55 @@ export default function HomePage() {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const data = await response.json();
-      await addHistory({ ...data, userId: user.id });
-      setSearchActive(true);
-      setSearchMode("new");
+      // Handle streaming response
+      const reader = response.body?.getReader();
+      const decoder = new TextDecoder();
+      let accumulatedResponse = "";
+
+      if (reader) {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          const chunk = decoder.decode(value, { stream: true });
+          accumulatedResponse += chunk;
+
+          // Update results with accumulated response
+          setSearchResults((prev: any) => ({
+            ...prev,
+            response: accumulatedResponse,
+          }));
+        }
+      }
+
+      // Save to history after streaming completes
+      const finalResults = {
+        query: currentQuery,
+        response: accumulatedResponse,
+        environmental: searchResults?.environmental || {
+          energyUsage: 0,
+          carbonEmissions: 0,
+          waterUsage: 0,
+          efficiency: "medium" as const,
+          tokenCount: 0,
+        },
+        tokenUsage: searchResults?.tokenUsage || {
+          inputTokens: 0,
+          outputTokens: 0,
+          totalTokens: 0,
+        },
+      };
+
+      await addHistory({ ...finalResults, userId: user.id });
       toast.success("Search successful!");
-      setSearchResults(data);
     } catch (error) {
       // Only show generic error if we haven't shown a specific one
       if (!(error as Error).message.includes("HTTP error!")) {
         toast.error("Search failed. Please try again.");
       }
       console.error("Search failed:", error);
+      setSearchResults(null);
+      setSearchActive(false);
     } finally {
       setIsLoading(false);
       setQuery("");
@@ -116,13 +175,13 @@ export default function HomePage() {
 
   return (
     <div className="bg-slate-900 text-slate-50">
-      {/* Green Smoke Effect */}
-      <GreenSmokeEffect />
-      
       <div className="relative min-h-screen flex flex-col pt-40 ">
+        {/* Green Smoke Effect - Only in hero section */}
+        <GreenSmokeEffect />
+
         <Spotlight />
 
-        <main className="flex-1 flex flex-col justify-center overflow-y-auto pt-12">
+        <main className="flex-1 flex flex-col justify-center overflow-y-auto pt-12 relative z-10">
           {/* Always show main content */}
           <div className="w-full max-w-4xl mx-auto px-6 text-center mb-8">
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-50 mb-6 leading-tight tracking-tight drop-shadow-md">
