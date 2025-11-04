@@ -101,20 +101,83 @@ export async function POST(req: NextRequest) {
       prompt: sanitizedQuery,
       system:
         "You are a helpful assistant focused on providing accurate, informative responses while being environmentally conscious. Keep responses concise but comprehensive.",
-      onFinish: async ({ text, usage }) => {
-        // Save to database after streaming completes
+    });
+
+    // Create a custom stream that appends environmental data at the end
+    const encoder = new TextEncoder();
+    const decoder = new TextDecoder();
+
+    let fullText = "";
+    let tokenUsage = { inputTokens: 0, outputTokens: 0 };
+
+    const stream = new ReadableStream({
+      async start(controller) {
         try {
+          // Stream the text
+          for await (const chunk of result.textStream) {
+            fullText += chunk;
+            controller.enqueue(encoder.encode(chunk));
+          }
+
+          // Get token usage from result - await the promise
+          try {
+            const usage = await result.usage;
+            console.log("Raw usage from AI SDK:", JSON.stringify(usage));
+
+            if (usage) {
+              tokenUsage = {
+                inputTokens: usage.inputTokens || 0,
+                outputTokens: usage.outputTokens || 0,
+              };
+            } else {
+              // Fallback: estimate tokens if usage is not available
+              tokenUsage = {
+                inputTokens: Math.ceil(sanitizedQuery.length / 4),
+                outputTokens: Math.ceil(fullText.length / 4),
+              };
+              console.log("Usage was undefined, using estimated tokens");
+            }
+          } catch (err) {
+            console.error("Error getting usage:", err);
+            // Fallback: estimate tokens
+            tokenUsage = {
+              inputTokens: Math.ceil(sanitizedQuery.length / 4),
+              outputTokens: Math.ceil(fullText.length / 4),
+            };
+          }
+
+          console.log("Processed token usage:", tokenUsage);
+
+          // Calculate environmental impact
           const environmental = calculateEnvironmentalImpact(
             "gpt-4o",
-            usage?.inputTokens || 0,
-            usage?.outputTokens || 0,
+            tokenUsage.inputTokens,
+            tokenUsage.outputTokens,
             false
           );
 
+          console.log("Environmental impact:", environmental);
+
+          // Send environmental data as a special marker at the end
+          const metadata = {
+            environmental,
+            tokenUsage: {
+              inputTokens: tokenUsage.inputTokens,
+              outputTokens: tokenUsage.outputTokens,
+              totalTokens: tokenUsage.inputTokens + tokenUsage.outputTokens,
+            },
+          };
+
+          console.log("Sending metadata:", metadata);
+          controller.enqueue(
+            encoder.encode(`\n__META__${JSON.stringify(metadata)}__META__`)
+          );
+
+          // Save to database
           await SearchModel.create({
             userId: new ObjectId(user._id),
             query: sanitizedQuery,
-            response: text,
+            response: fullText,
             modelUsed: "gpt-4o",
             environmental,
           });
@@ -125,15 +188,18 @@ export async function POST(req: NextRequest) {
             userId: user._id!.toString(),
             tokenCount: environmental.tokenCount,
           });
+
+          controller.close();
         } catch (error) {
-          logger.error("Error saving search result", { error });
+          logger.error("Error during streaming", { error });
+          controller.error(error);
         }
       },
     });
 
-    // Return streaming response
-    return result.toTextStreamResponse({
+    return new Response(stream, {
       headers: {
+        "Content-Type": "text/plain; charset=utf-8",
         "X-User-Id": user._id!.toString(),
         "X-Model": "gpt-4o",
       },

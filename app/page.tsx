@@ -66,6 +66,8 @@ export default function HomePage() {
     setSearchActive(true);
     setSearchMode("new");
 
+    let accumulatedResponse = "";
+    
     try {
       const response = await fetch("/api/search", {
         method: "POST",
@@ -97,7 +99,9 @@ export default function HomePage() {
       // Handle streaming response
       const reader = response.body?.getReader();
       const decoder = new TextDecoder();
-      let accumulatedResponse = "";
+      let fullStreamData = "";
+      let environmentalData: any = null;
+      let tokenUsageData: any = null;
 
       if (reader) {
         while (true) {
@@ -105,47 +109,88 @@ export default function HomePage() {
           if (done) break;
 
           const chunk = decoder.decode(value, { stream: true });
-          accumulatedResponse += chunk;
+          fullStreamData += chunk;
+          
+          // Check if metadata is included in the full stream
+          const metaMatch = fullStreamData.match(/__META__(.+?)__META__/);
+          if (metaMatch) {
+            try {
+              // Extract metadata and remove it from response
+              const metadata = JSON.parse(metaMatch[1]);
+              environmentalData = metadata.environmental;
+              tokenUsageData = metadata.tokenUsage;
+              accumulatedResponse = fullStreamData.replace(/__META__.+?__META__/, '').trim();
+              console.log('Parsed metadata:', metadata);
+            } catch (e) {
+              console.error('Failed to parse metadata:', e);
+              accumulatedResponse = fullStreamData.replace(/__META__.+?__META__/, '').trim();
+            }
+          } else {
+            accumulatedResponse = fullStreamData;
+          }
 
           // Update results with accumulated response
           setSearchResults((prev: any) => ({
             ...prev,
             response: accumulatedResponse,
+            environmental: environmentalData || prev.environmental,
+            tokenUsage: tokenUsageData || prev.tokenUsage,
           }));
         }
       }
+      
+      console.log('Final environmental data:', environmentalData);
+      console.log('Final token usage data:', tokenUsageData);
 
       // Save to history after streaming completes
       const finalResults = {
         query: currentQuery,
         response: accumulatedResponse,
-        environmental: searchResults?.environmental || {
+        environmental: environmentalData || {
           energyUsage: 0,
           carbonEmissions: 0,
           waterUsage: 0,
           efficiency: "medium" as const,
           tokenCount: 0,
         },
-        tokenUsage: searchResults?.tokenUsage || {
+        tokenUsage: tokenUsageData || {
           inputTokens: 0,
           outputTokens: 0,
           totalTokens: 0,
         },
       };
 
-      await addHistory({ ...finalResults, userId: user.id });
-      toast.success("Search successful!");
-    } catch (error) {
-      // Only show generic error if we haven't shown a specific one
-      if (!(error as Error).message.includes("HTTP error!")) {
-        toast.error("Search failed. Please try again.");
+      // Force final state update with complete data
+      setSearchResults(finalResults);
+      
+      // Try to save to history, but don't fail the whole search if it errors
+      try {
+        await addHistory({ ...finalResults, userId: user.id });
+      } catch (historyError) {
+        console.error("Failed to save to history:", historyError);
+        // Continue anyway - the search was successful
       }
+      
+      toast.success("Search successful!");
+      setQuery(""); // Clear query only on success
+    } catch (error) {
       console.error("Search failed:", error);
-      setSearchResults(null);
-      setSearchActive(false);
+      
+      // Check if this is a streaming error (after we already started showing results)
+      if (accumulatedResponse && accumulatedResponse.length > 0) {
+        // We have partial results, keep them
+        console.log("Keeping partial streaming results");
+        toast.warning("Search completed with errors. Results may be incomplete.");
+      } else {
+        // No results yet, show error and reset
+        if (!(error as Error).message.includes("HTTP error!")) {
+          toast.error("Search failed. Please try again.");
+        }
+        setSearchResults(null);
+        setSearchActive(false);
+      }
     } finally {
       setIsLoading(false);
-      setQuery("");
     }
   };
 
@@ -176,32 +221,34 @@ export default function HomePage() {
   return (
     <div className="bg-slate-900 text-slate-50">
       <div className="relative min-h-screen flex flex-col pt-40 ">
-        {/* Green Smoke Effect - Only in hero section */}
-        <GreenSmokeEffect />
+        {/* Green Smoke Effect - Only show when hero section is visible */}
+        {!isSearchActive && <GreenSmokeEffect />}
 
         <Spotlight />
 
         <main className="flex-1 flex flex-col justify-center overflow-y-auto pt-12 relative z-10">
-          {/* Always show main content */}
-          <div className="w-full max-w-4xl mx-auto px-6 text-center mb-8">
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-50 mb-6 leading-tight tracking-tight drop-shadow-md">
-              What do you want to know{" "}
-              <span className="bg-gradient-to-r from-cyan-300 to-violet-400 bg-clip-text text-transparent">
-                sustainably
-              </span>
-              ?
-            </h1>
+          {/* Hero Section - only show when NOT searching */}
+          {!isSearchActive && (
+            <div className="w-full max-w-4xl mx-auto px-6 text-center mb-8">
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-50 mb-6 leading-tight tracking-tight drop-shadow-md">
+                What do you want to know{" "}
+                <span className="bg-gradient-to-r from-cyan-300 to-violet-400 bg-clip-text text-transparent">
+                  sustainably
+                </span>
+                ?
+              </h1>
 
-            <div className="relative max-w-3xl mx-auto rounded-3xl p-[1px] bg-gradient-to-r mb-16 from-cyan-400/20 to-violet-400/20">
-              <div className="rounded-[23px] p-6 backdrop-blur-lg bg-slate-800/80">
-                <p className="text-base lg:text-lg text-slate-100 leading-relaxed font-normal">
-                  Get AI-powered answers while tracking the environmental impact
-                  of your queries! Set daily limits and discover the most
-                  energy-efficient models for your needs.
-                </p>
+              <div className="relative max-w-3xl mx-auto rounded-3xl p-[1px] bg-gradient-to-r mb-16 from-cyan-400/20 to-violet-400/20">
+                <div className="rounded-[23px] p-6 backdrop-blur-lg bg-slate-800/80">
+                  <p className="text-base lg:text-lg text-slate-100 leading-relaxed font-normal">
+                    Get AI-powered answers while tracking the environmental impact
+                    of your queries! Set daily limits and discover the most
+                    energy-efficient models for your needs.
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
+          )}
 
           {/* Search Results - only show when active */}
           {isSearchActive && (
@@ -212,6 +259,7 @@ export default function HomePage() {
                 <div className="w-full mx-auto px-6 lg:px-8">
                   <div className="backdrop-blur-lg">
                     <SearchResults
+                      key={searchResults?.tokenUsage?.totalTokens || 0}
                       isHome={true}
                       results={searchResults}
                       onNewSearch={handleNewSearch}

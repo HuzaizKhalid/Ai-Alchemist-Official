@@ -169,6 +169,10 @@ export function SearchResults({ results, isHome = false }: SearchResultsProps) {
   }
 
   const { query, response, environmental, tokenUsage } = results;
+  
+  // Debug: Log the received data
+  console.log('SearchResults received tokenUsage:', tokenUsage);
+  console.log('SearchResults received environmental:', environmental);
   const { setSearchActive } = useSearch();
 
   // Dynamic stats state
@@ -314,6 +318,8 @@ export function SearchResults({ results, isHome = false }: SearchResultsProps) {
         { name: "Output", value: tokenUsage.outputTokens },
       ]
     : [];
+  
+  console.log('tokenChartData:', tokenChartData);
 
   return (
     // Main container with better height management
