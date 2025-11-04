@@ -30,6 +30,7 @@ import { useSearch } from "@/context/searchContext";
 import { useState, useEffect } from "react";
 import ImageGallery from "./ImageGallery";
 import { CarbonOffsetCalculator } from "./CarbonOffsetCalculator";
+import { EndangeredAnimals } from "./EndangeredAnimals";
 
 // Interface remains the same for data compatibility
 export interface SearchResultsProps {
@@ -169,10 +170,10 @@ export function SearchResults({ results, isHome = false }: SearchResultsProps) {
   }
 
   const { query, response, environmental, tokenUsage } = results;
-  
+
   // Debug: Log the received data
-  console.log('SearchResults received tokenUsage:', tokenUsage);
-  console.log('SearchResults received environmental:', environmental);
+  console.log("SearchResults received tokenUsage:", tokenUsage);
+  console.log("SearchResults received environmental:", environmental);
   const { setSearchActive } = useSearch();
 
   // Dynamic stats state
@@ -318,8 +319,8 @@ export function SearchResults({ results, isHome = false }: SearchResultsProps) {
         { name: "Output", value: tokenUsage.outputTokens },
       ]
     : [];
-  
-  console.log('tokenChartData:', tokenChartData);
+
+  console.log("tokenChartData:", tokenChartData);
 
   return (
     // Main container with better height management
@@ -378,29 +379,8 @@ export function SearchResults({ results, isHome = false }: SearchResultsProps) {
               isLoading={imagesLoading}
             />
 
-            {/* Model Comparison Card */}
-            <Card className="bg-slate-800/50 border border-slate-700 shadow-xl">
-              <CardHeader className="flex-row items-center space-x-3">
-                <div className="w-8 h-8 lg:w-10 lg:h-10 bg-gray-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <GitCompare className="w-4 h-4 lg:w-5 lg:h-5 text-gray-400" />
-                </div>
-                <CardTitle className="text-lg lg:text-xl font-semibold text-white">
-                  Model Comparison
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="text-center py-8 lg:py-10">
-                <div className="w-12 h-12 lg:w-16 lg:h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4 border border-white/10">
-                  <Leaf className="w-6 h-6 lg:w-8 lg:h-8 text-white/30" />
-                </div>
-                <h4 className="text-lg lg:text-xl font-semibold text-white mb-2">
-                  Coming Soon
-                </h4>
-                <p className="text-white/60 max-w-sm mx-auto text-xs lg:text-sm">
-                  Compare environmental impact across different models to see
-                  which is most efficient.
-                </p>
-              </CardContent>
-            </Card>
+            {/* Endangered Animals Card */}
+            <EndangeredAnimals />
           </div>
 
           {/* Right Column: Data Visualizations */}
