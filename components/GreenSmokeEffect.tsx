@@ -7,7 +7,7 @@ export function GreenSmokeEffect() {
     <div className="absolute top-0 left-0 w-full h-[70vh] pointer-events-none overflow-hidden">
       {/* Fade out mask to prevent affecting bottom section */}
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-slate-900 pointer-events-none z-10"></div>
-      
+
       {/* Sharp bright glow at extreme right edge */}
       <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-emerald-400/40 via-emerald-500/15 to-transparent"></div>
 

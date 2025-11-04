@@ -67,7 +67,7 @@ export default function HomePage() {
     setSearchMode("new");
 
     let accumulatedResponse = "";
-    
+
     try {
       const response = await fetch("/api/search", {
         method: "POST",
@@ -110,7 +110,7 @@ export default function HomePage() {
 
           const chunk = decoder.decode(value, { stream: true });
           fullStreamData += chunk;
-          
+
           // Check if metadata is included in the full stream
           const metaMatch = fullStreamData.match(/__META__(.+?)__META__/);
           if (metaMatch) {
@@ -119,11 +119,15 @@ export default function HomePage() {
               const metadata = JSON.parse(metaMatch[1]);
               environmentalData = metadata.environmental;
               tokenUsageData = metadata.tokenUsage;
-              accumulatedResponse = fullStreamData.replace(/__META__.+?__META__/, '').trim();
-              console.log('Parsed metadata:', metadata);
+              accumulatedResponse = fullStreamData
+                .replace(/__META__.+?__META__/, "")
+                .trim();
+              console.log("Parsed metadata:", metadata);
             } catch (e) {
-              console.error('Failed to parse metadata:', e);
-              accumulatedResponse = fullStreamData.replace(/__META__.+?__META__/, '').trim();
+              console.error("Failed to parse metadata:", e);
+              accumulatedResponse = fullStreamData
+                .replace(/__META__.+?__META__/, "")
+                .trim();
             }
           } else {
             accumulatedResponse = fullStreamData;
@@ -138,9 +142,9 @@ export default function HomePage() {
           }));
         }
       }
-      
-      console.log('Final environmental data:', environmentalData);
-      console.log('Final token usage data:', tokenUsageData);
+
+      console.log("Final environmental data:", environmentalData);
+      console.log("Final token usage data:", tokenUsageData);
 
       // Save to history after streaming completes
       const finalResults = {
@@ -162,7 +166,7 @@ export default function HomePage() {
 
       // Force final state update with complete data
       setSearchResults(finalResults);
-      
+
       // Try to save to history, but don't fail the whole search if it errors
       try {
         await addHistory({ ...finalResults, userId: user.id });
@@ -170,17 +174,19 @@ export default function HomePage() {
         console.error("Failed to save to history:", historyError);
         // Continue anyway - the search was successful
       }
-      
+
       toast.success("Search successful!");
       setQuery(""); // Clear query only on success
     } catch (error) {
       console.error("Search failed:", error);
-      
+
       // Check if this is a streaming error (after we already started showing results)
       if (accumulatedResponse && accumulatedResponse.length > 0) {
         // We have partial results, keep them
         console.log("Keeping partial streaming results");
-        toast.warning("Search completed with errors. Results may be incomplete.");
+        toast.warning(
+          "Search completed with errors. Results may be incomplete."
+        );
       } else {
         // No results yet, show error and reset
         if (!(error as Error).message.includes("HTTP error!")) {
@@ -241,9 +247,9 @@ export default function HomePage() {
               <div className="relative max-w-3xl mx-auto rounded-3xl p-[1px] bg-gradient-to-r mb-16 from-cyan-400/20 to-violet-400/20">
                 <div className="rounded-[23px] p-6 backdrop-blur-lg bg-slate-800/80">
                   <p className="text-base lg:text-lg text-slate-100 leading-relaxed font-normal">
-                    Get AI-powered answers while tracking the environmental impact
-                    of your queries! Set daily limits and discover the most
-                    energy-efficient models for your needs.
+                    Get AI-powered answers while tracking the environmental
+                    impact of your queries! Set daily limits and discover the
+                    most energy-efficient models for your needs.
                   </p>
                 </div>
               </div>
