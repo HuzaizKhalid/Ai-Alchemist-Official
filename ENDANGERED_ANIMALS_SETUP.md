@@ -28,7 +28,7 @@ NatureServe Explorer provides comprehensive conservation data for species across
 ✅ **Public API** - Open access for everyone  
 ✅ **Official Data** - Trusted conservation information  
 ✅ **Real-time Status** - Current conservation rankings  
-✅ **Comprehensive** - Thousands of species tracked  
+✅ **Comprehensive** - Thousands of species tracked
 
 ### No Setup Required!
 
