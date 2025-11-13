@@ -174,69 +174,279 @@ const endangeredAnimals = [
 ];
 
 // Climate-affected species element UIDs for NatureServe API
+// Updated list with more climate-vulnerable species
 const natureServeSpecies = [
-  "ELEMENT_GLOBAL.2.105212", // Polar Bear
-  "ELEMENT_GLOBAL.2.100925", // American Pika
-  "ELEMENT_GLOBAL.2.100261", // Canada Lynx
-  "ELEMENT_GLOBAL.2.105925", // Pacific Walrus
-  "ELEMENT_GLOBAL.2.106311", // Woodland Caribou
+  {
+    uid: "ELEMENT_GLOBAL.2.105212",
+    name: "Polar Bear",
+    unsplashQuery: "polar bear arctic",
+  },
+  {
+    uid: "ELEMENT_GLOBAL.2.100925",
+    name: "American Pika",
+    unsplashQuery: "pika mountain",
+  },
+  {
+    uid: "ELEMENT_GLOBAL.2.100261",
+    name: "Canada Lynx",
+    unsplashQuery: "lynx snow",
+  },
+  {
+    uid: "ELEMENT_GLOBAL.2.105925",
+    name: "Pacific Walrus",
+    unsplashQuery: "walrus ice",
+  },
+  {
+    uid: "ELEMENT_GLOBAL.2.106311",
+    name: "Woodland Caribou",
+    unsplashQuery: "caribou forest",
+  },
+  {
+    uid: "ELEMENT_GLOBAL.2.104736",
+    name: "Loggerhead Sea Turtle",
+    unsplashQuery: "sea turtle ocean",
+  },
+  {
+    uid: "ELEMENT_GLOBAL.2.100925",
+    name: "Arctic Fox",
+    unsplashQuery: "arctic fox snow",
+  },
 ];
 
-async function fetchFromNatureServe() {
-  const apiKey = process.env.NATURESERVE_API_KEY;
+// Fetch real species images from multiple sources
+async function fetchSpeciesImage(
+  scientificName: string,
+  commonName: string,
+  unsplashQuery: string
+): Promise<string> {
+  try {
+    // Try iNaturalist API first (free, no key required)
+    const iNatResponse = await fetch(
+      `https://api.inaturalist.org/v1/taxa?q=${encodeURIComponent(
+        scientificName
+      )}&rank=species&per_page=1`,
+      {
+        headers: { Accept: "application/json" },
+        next: { revalidate: 3600 }, // Cache for 1 hour
+      }
+    );
 
-  if (!apiKey) {
-    console.log("NatureServe API key not found, using fallback data");
-    return null;
+    if (iNatResponse.ok) {
+      const iNatData = await iNatResponse.json();
+      if (
+        iNatData.results &&
+        iNatData.results.length > 0 &&
+        iNatData.results[0].default_photo
+      ) {
+        const photo = iNatData.results[0].default_photo;
+        // Use medium size image (more reliable than large)
+        const imageUrl = photo.medium_url || photo.large_url || photo.small_url;
+        if (imageUrl) {
+          console.log(
+            `✅ Found iNaturalist image for: ${commonName} - ${imageUrl}`
+          );
+          return imageUrl;
+        }
+      } else {
+        console.log(`ℹ️ No iNaturalist photos found for: ${scientificName}`);
+      }
+    }
+  } catch (error) {
+    console.error("iNaturalist API error:", error);
   }
 
   try {
-    // Select a random species UID
-    const randomUID =
+    // Try Wikipedia/Wikimedia Commons as second option
+    const wikiResponse = await fetch(
+      `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(
+        commonName
+      )}`,
+      {
+        headers: { Accept: "application/json" },
+        next: { revalidate: 3600 },
+      }
+    );
+
+    if (wikiResponse.ok) {
+      const wikiData = await wikiResponse.json();
+      if (
+        wikiData.originalimage &&
+        wikiData.originalimage.source &&
+        wikiData.originalimage.width >= 400
+      ) {
+        console.log(
+          `✅ Found Wikipedia image for: ${commonName} - ${wikiData.originalimage.source}`
+        );
+        return wikiData.originalimage.source;
+      } else {
+        console.log(`ℹ️ No suitable Wikipedia image for: ${commonName}`);
+      }
+    }
+  } catch (error) {
+    console.error("Wikipedia API error:", error);
+  }
+
+  // Fallback to Unsplash with specific search
+  console.log(
+    `📸 Using Unsplash fallback for: ${commonName} - ${unsplashQuery}`
+  );
+  return `https://source.unsplash.com/800x600/?${encodeURIComponent(
+    unsplashQuery
+  )}`;
+}
+
+async function fetchFromNatureServe() {
+  // Note: NatureServe Explorer API is public and doesn't require an API key
+  // See: https://explorer.natureserve.org/api-docs/
+  // Optional API key can be provided for special/bulk access
+  const apiKey = process.env.NATURESERVE_API_KEY;
+
+  try {
+    // Select a random species
+    const randomSpecies =
       natureServeSpecies[Math.floor(Math.random() * natureServeSpecies.length)];
 
+    console.log(`Fetching NatureServe data for: ${randomSpecies.name}`);
+
+    // Build headers - API key is optional for public endpoints
+    const headers: HeadersInit = {
+      Accept: "application/json",
+    };
+
+    if (apiKey) {
+      headers["X-API-Key"] = apiKey;
+    }
+
     const response = await fetch(
-      `https://explorer.natureserve.org/api/data/speciesSearch?uid=${randomUID}`,
+      `https://explorer.natureserve.org/api/data/taxon/${randomSpecies.uid}`,
       {
-        headers: {
-          Accept: "application/json",
-        },
+        headers,
+        cache: "no-store", // Ensure fresh data
       }
     );
 
     if (!response.ok) {
+      console.error(
+        `NatureServe API returned ${response.status}: ${response.statusText}`
+      );
       throw new Error(`NatureServe API returned ${response.status}`);
     }
 
     const data = await response.json();
 
-    if (!data || !data.results || data.results.length === 0) {
+    if (!data) {
+      console.log("No data received from NatureServe API");
       return null;
     }
 
-    const species = data.results[0];
+    // Log the full response for debugging
+    console.log("NatureServe API Response:", JSON.stringify(data, null, 2));
+
+    // Parse the response based on NatureServe API structure
+    const species = data;
+
+    // Extract threats from conservation status data
+    const threats: string[] = [];
+    if (species.threats && Array.isArray(species.threats)) {
+      threats.push(
+        ...species.threats.map((t: any) => t.description || t.name || t)
+      );
+    }
+
+    // Add default climate-related threats if none found
+    if (threats.length === 0) {
+      threats.push(
+        "Climate change affecting habitat conditions",
+        "Temperature and precipitation pattern changes",
+        "Habitat loss from environmental changes",
+        "Altered seasonal patterns and migration timing"
+      );
+    }
+
+    // Map conservation status to readable format
+    const statusMap: Record<string, string> = {
+      G1: "Critically Imperiled",
+      G2: "Imperiled",
+      G3: "Vulnerable",
+      G4: "Apparently Secure",
+      G5: "Secure",
+      GX: "Presumed Extinct",
+      GH: "Possibly Extinct",
+      T1: "Critically Imperiled",
+      T2: "Imperiled",
+      T3: "Vulnerable",
+      T4: "Apparently Secure",
+      T5: "Secure",
+    };
+
+    // Try multiple possible status fields
+    let status = "Not Assessed";
+    const possibleStatus =
+      species.roundedGlobalStatus ||
+      species.globalStatus ||
+      species.conservationStatus?.statusCode ||
+      species.grank ||
+      species.g_rank;
+
+    if (possibleStatus) {
+      // Extract just the rank code (e.g., "G3" from "G3T3")
+      const rankMatch = possibleStatus.match(/[GT]\d/);
+      const rankCode = rankMatch ? rankMatch[0] : possibleStatus;
+      status = statusMap[rankCode] || possibleStatus;
+    }
+
+    console.log(`Status extracted: ${status} (from: ${possibleStatus})`);
+
+    const speciesName =
+      species.primaryCommonName || species.commonName || randomSpecies.name;
+    const scientificName =
+      species.scientificName || "Scientific name unavailable";
+
+    // Fetch real species image from iNaturalist, Wikipedia, or Unsplash
+    const speciesImage = await fetchSpeciesImage(
+      scientificName,
+      speciesName,
+      randomSpecies.unsplashQuery
+    );
+
+    // Extract population data from various possible fields
+    let population = "Population data not available";
+
+    if (species.populationSize) {
+      population = species.populationSize;
+    } else if (species.population) {
+      population = species.population;
+    } else if (species.populationComments) {
+      population = species.populationComments;
+    } else if (species.demographicsTrend) {
+      population = `Trend: ${species.demographicsTrend}`;
+    } else if (species.shortDescription) {
+      // Try to extract population info from description
+      const popMatch = species.shortDescription.match(
+        /(\d[\d,\s-]+)\s*(individuals?|specimens?|animals?)/i
+      );
+      if (popMatch) {
+        population = popMatch[0];
+      }
+    }
+
+    console.log(`Population extracted: ${population}`);
 
     // Map NatureServe data to our format
     return {
-      name: species.primaryCommonName || species.scientificName,
-      scientificName: species.scientificName,
-      population: species.populationSize || "Population data not available",
-      status:
-        species.roundedGlobalStatus ||
-        species.conservationStatus ||
-        "Not Assessed",
-      image: `https://source.unsplash.com/800x600/?${encodeURIComponent(
-        species.primaryCommonName || species.scientificName
-      )},wildlife`,
-      threats: [
-        "Climate change affecting habitat",
-        "Temperature fluctuations",
-        "Habitat loss from environmental changes",
-        "Changes in seasonal patterns",
-      ],
+      name: speciesName,
+      scientificName: scientificName,
+      population: population,
+      status: status,
+      image: speciesImage,
+      threats: threats.slice(0, 4), // Limit to 4 threats for display
+      source: "NatureServe", // Add source indicator
     };
   } catch (error) {
     console.error("NatureServe API error:", error);
+    if (error instanceof Error) {
+      console.error("Error details:", error.message);
+    }
     return null;
   }
 }
@@ -253,6 +463,29 @@ export async function GET() {
     // Fallback to curated data
     const randomIndex = Math.floor(Math.random() * endangeredAnimals.length);
     const animal = endangeredAnimals[randomIndex];
+
+    // Try to enhance fallback data with real images from iNaturalist/Wikipedia
+    try {
+      const realImage = await fetchSpeciesImage(
+        animal.scientificName,
+        animal.name,
+        animal.name.toLowerCase().replace(/\s+/g, " ") + " wildlife"
+      );
+
+      // Only update if we got a different image (not from Unsplash fallback)
+      if (realImage && !realImage.includes("unsplash")) {
+        console.log(`✅ Enhanced fallback image for: ${animal.name}`);
+        return NextResponse.json(
+          {
+            ...animal,
+            image: realImage,
+          },
+          { status: 200 }
+        );
+      }
+    } catch (imageError) {
+      console.log("Could not enhance fallback image, using original");
+    }
 
     return NextResponse.json(animal, { status: 200 });
   } catch (error) {

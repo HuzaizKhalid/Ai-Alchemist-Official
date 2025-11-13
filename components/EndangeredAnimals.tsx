@@ -12,6 +12,7 @@ interface AnimalData {
   status: string;
   image: string;
   threats: string[];
+  source?: string; // 'NatureServe' or undefined (fallback data)
 }
 
 export function EndangeredAnimals() {
@@ -119,6 +120,14 @@ export function EndangeredAnimals() {
               {animal.status}
             </span>
           </div>
+          {/* Data Source Indicator */}
+          {animal.source === "NatureServe" && (
+            <div className="absolute top-3 left-3 bg-green-600/90 backdrop-blur-sm px-2 py-1 rounded-full">
+              <span className="text-white text-[10px] font-semibold uppercase tracking-wide">
+                Live Data
+              </span>
+            </div>
+          )}
         </div>
 
         {/* Animal Info */}
