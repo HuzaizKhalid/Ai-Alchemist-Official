@@ -29,7 +29,7 @@ import { Button } from "./ui/button";
 import { useSearch } from "@/context/searchContext";
 import { useState, useEffect } from "react";
 import ImageGallery from "./ImageGallery";
-import { CarbonOffsetCalculator } from "./CarbonOffsetCalculator";
+import { ClimateWidget } from "./ClimateWidget";
 import { EndangeredAnimals } from "./EndangeredAnimals";
 
 // Interface remains the same for data compatibility
@@ -479,11 +479,8 @@ export function SearchResults({ results, isHome = false }: SearchResultsProps) {
               />
             </div>
 
-            {/* Carbon Offset Calculator */}
-            <CarbonOffsetCalculator
-              carbonEmissions={environmental.carbonEmissions}
-              showExtendedInfo={false}
-            />
+            {/* Climate Widget */}
+            <ClimateWidget carbonEmissions={environmental.carbonEmissions} />
 
             {/* Daily Stats Section */}
             <section className="bg-gray-900 text-white py-8 lg:py-12 px-4 lg:px-6 text-center rounded-xl">

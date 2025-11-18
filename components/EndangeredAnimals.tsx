@@ -114,29 +114,38 @@ export function EndangeredAnimals() {
               const target = e.target as HTMLImageElement;
               // Fallback to a reliable Unsplash image based on animal type
               const fallbackImages: { [key: string]: string } = {
-                'polar': 'https://images.unsplash.com/photo-1589656966895-2f33e7653819?w=800&q=80',
-                'bear': 'https://images.unsplash.com/photo-1589656966895-2f33e7653819?w=800&q=80',
-                'turtle': 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800&q=80',
-                'penguin': 'https://images.unsplash.com/photo-1551986782-d0169b3f8fa7?w=800&q=80',
-                'fox': 'https://images.unsplash.com/photo-1600438459225-eb0ae5a0e8f2?w=800&q=80',
-                'whale': 'https://images.unsplash.com/photo-1564757981863-ed3c4e255d5d?w=800&q=80',
-                'koala': 'https://images.unsplash.com/photo-1459262838948-3e2de6c1ec80?w=800&q=80',
-                'leopard': 'https://images.unsplash.com/photo-1614027164847-1b28cfe1df60?w=800&q=80',
-                'butterfly': 'https://images.unsplash.com/photo-1568526381923-caf3fd520382?w=800&q=80',
-                'orangutan': 'https://images.unsplash.com/photo-1540573133985-87b6da6d54a9?w=800&q=80',
-                'pika': 'https://images.unsplash.com/photo-1625792550834-a3ce502f0e19?w=800&q=80',
-                'caribou': 'https://images.unsplash.com/photo-1551892374-ecf8dd77f061?w=800&q=80',
-                'lynx': 'https://images.unsplash.com/photo-1612588558678-0f41d6e1a8b2?w=800&q=80',
+                polar:
+                  "https://images.unsplash.com/photo-1589656966895-2f33e7653819?w=800&q=80",
+                bear: "https://images.unsplash.com/photo-1589656966895-2f33e7653819?w=800&q=80",
+                turtle:
+                  "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800&q=80",
+                penguin:
+                  "https://images.unsplash.com/photo-1551986782-d0169b3f8fa7?w=800&q=80",
+                fox: "https://images.unsplash.com/photo-1600438459225-eb0ae5a0e8f2?w=800&q=80",
+                whale:
+                  "https://images.unsplash.com/photo-1564757981863-ed3c4e255d5d?w=800&q=80",
+                koala:
+                  "https://images.unsplash.com/photo-1459262838948-3e2de6c1ec80?w=800&q=80",
+                leopard:
+                  "https://images.unsplash.com/photo-1614027164847-1b28cfe1df60?w=800&q=80",
+                butterfly:
+                  "https://images.unsplash.com/photo-1568526381923-caf3fd520382?w=800&q=80",
+                orangutan:
+                  "https://images.unsplash.com/photo-1540573133985-87b6da6d54a9?w=800&q=80",
+                pika: "https://images.unsplash.com/photo-1625792550834-a3ce502f0e19?w=800&q=80",
+                caribou:
+                  "https://images.unsplash.com/photo-1551892374-ecf8dd77f061?w=800&q=80",
+                lynx: "https://images.unsplash.com/photo-1612588558678-0f41d6e1a8b2?w=800&q=80",
               };
-              
+
               // Find matching fallback or use default wildlife image
-              const animalKey = Object.keys(fallbackImages).find(key => 
+              const animalKey = Object.keys(fallbackImages).find((key) =>
                 animal.name.toLowerCase().includes(key)
               );
-              
-              target.src = animalKey 
+
+              target.src = animalKey
                 ? fallbackImages[animalKey]
-                : 'https://images.unsplash.com/photo-1564760055775-d63b17a55c44?w=800&q=80';
+                : "https://images.unsplash.com/photo-1564760055775-d63b17a55c44?w=800&q=80";
             }}
           />
           {/* Status Badge */}

@@ -260,10 +260,14 @@ async function fetchSpeciesImage(
     if (wikiScientificResponse.ok) {
       const wikiData = await wikiScientificResponse.json();
       if (wikiData.thumbnail && wikiData.thumbnail.source) {
-        console.log(`✅ Found Wikipedia image (scientific) for: ${scientificName}`);
+        console.log(
+          `✅ Found Wikipedia image (scientific) for: ${scientificName}`
+        );
         return wikiData.thumbnail.source.replace(/\/\d+px-/, "/800px-");
       } else if (wikiData.originalimage && wikiData.originalimage.source) {
-        console.log(`✅ Found Wikipedia original (scientific) for: ${scientificName}`);
+        console.log(
+          `✅ Found Wikipedia original (scientific) for: ${scientificName}`
+        );
         return wikiData.originalimage.source;
       }
     }
@@ -274,23 +278,35 @@ async function fetchSpeciesImage(
   // Get curated fallback images based on species type
   const lowerName = commonName.toLowerCase();
   const fallbackImageMap: { [key: string]: string } = {
-    'polar bear': 'https://images.unsplash.com/photo-1589656966895-2f33e7653819?w=800&q=80',
-    'turtle': 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800&q=80',
-    'penguin': 'https://images.unsplash.com/photo-1551986782-d0169b3f8fa7?w=800&q=80',
-    'fox': 'https://images.unsplash.com/photo-1600438459225-eb0ae5a0e8f2?w=800&q=80',
-    'whale': 'https://images.unsplash.com/photo-1564757981863-ed3c4e255d5d?w=800&q=80',
-    'koala': 'https://images.unsplash.com/photo-1459262838948-3e2de6c1ec80?w=800&q=80',
-    'leopard': 'https://images.unsplash.com/photo-1614027164847-1b28cfe1df60?w=800&q=80',
-    'butterfly': 'https://images.unsplash.com/photo-1568526381923-caf3fd520382?w=800&q=80',
-    'orangutan': 'https://images.unsplash.com/photo-1540573133985-87b6da6d54a9?w=800&q=80',
-    'pika': 'https://images.unsplash.com/photo-1625792550834-a3ce502f0e19?w=800&q=80',
-    'caribou': 'https://images.unsplash.com/photo-1551892374-ecf8dd77f061?w=800&q=80',
-    'lynx': 'https://images.unsplash.com/photo-1612588558678-0f41d6e1a8b2?w=800&q=80',
-    'walrus': 'https://images.unsplash.com/photo-1583511666407-5f06533f2113?w=800&q=80',
+    "polar bear":
+      "https://images.unsplash.com/photo-1589656966895-2f33e7653819?w=800&q=80",
+    turtle:
+      "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800&q=80",
+    penguin:
+      "https://images.unsplash.com/photo-1551986782-d0169b3f8fa7?w=800&q=80",
+    fox: "https://images.unsplash.com/photo-1600438459225-eb0ae5a0e8f2?w=800&q=80",
+    whale:
+      "https://images.unsplash.com/photo-1564757981863-ed3c4e255d5d?w=800&q=80",
+    koala:
+      "https://images.unsplash.com/photo-1459262838948-3e2de6c1ec80?w=800&q=80",
+    leopard:
+      "https://images.unsplash.com/photo-1614027164847-1b28cfe1df60?w=800&q=80",
+    butterfly:
+      "https://images.unsplash.com/photo-1568526381923-caf3fd520382?w=800&q=80",
+    orangutan:
+      "https://images.unsplash.com/photo-1540573133985-87b6da6d54a9?w=800&q=80",
+    pika: "https://images.unsplash.com/photo-1625792550834-a3ce502f0e19?w=800&q=80",
+    caribou:
+      "https://images.unsplash.com/photo-1551892374-ecf8dd77f061?w=800&q=80",
+    lynx: "https://images.unsplash.com/photo-1612588558678-0f41d6e1a8b2?w=800&q=80",
+    walrus:
+      "https://images.unsplash.com/photo-1583511666407-5f06533f2113?w=800&q=80",
   };
 
   // Find matching fallback
-  const matchedKey = Object.keys(fallbackImageMap).find(key => lowerName.includes(key));
+  const matchedKey = Object.keys(fallbackImageMap).find((key) =>
+    lowerName.includes(key)
+  );
   if (matchedKey) {
     console.log(`📸 Using curated fallback for: ${commonName}`);
     return fallbackImageMap[matchedKey];
@@ -298,7 +314,7 @@ async function fetchSpeciesImage(
 
   // Generic wildlife fallback
   console.log(`📸 Using generic wildlife image for: ${commonName}`);
-  return 'https://images.unsplash.com/photo-1564760055775-d63b17a55c44?w=800&q=80';
+  return "https://images.unsplash.com/photo-1564760055775-d63b17a55c44?w=800&q=80";
 }
 
 async function fetchFromNatureServe() {
@@ -421,65 +437,262 @@ async function fetchFromNatureServe() {
       const habitat = species.habitat || species.habitatComments || "";
       const lowerHabitat = habitat.toLowerCase();
       const lowerName = speciesName.toLowerCase();
-      
-      if (lowerHabitat.includes("arctic") || lowerHabitat.includes("polar") || lowerName.includes("polar") || lowerName.includes("arctic")) {
+
+      if (
+        lowerHabitat.includes("arctic") ||
+        lowerHabitat.includes("polar") ||
+        lowerName.includes("polar") ||
+        lowerName.includes("arctic")
+      ) {
         const arcticThreats = [
-          ["Sea ice loss due to warming temperatures", "Reduced hunting and breeding habitat", "Changing prey availability", "Increased human-wildlife conflicts"],
-          ["Melting sea ice reducing habitat range", "Earlier ice breakup affecting breeding cycles", "Declining seal populations from ice loss", "Extended fasting periods due to habitat loss"],
-          ["Arctic warming twice as fast as global average", "Loss of denning habitat in sea ice", "Reduced access to traditional food sources", "Increased energy expenditure for hunting"],
-          ["Shrinking ice platforms for hunting", "Changes in seal distribution and abundance", "Longer ice-free seasons in Arctic waters", "Competition for declining resources"]
+          [
+            "Sea ice loss due to warming temperatures",
+            "Reduced hunting and breeding habitat",
+            "Changing prey availability",
+            "Increased human-wildlife conflicts",
+          ],
+          [
+            "Melting sea ice reducing habitat range",
+            "Earlier ice breakup affecting breeding cycles",
+            "Declining seal populations from ice loss",
+            "Extended fasting periods due to habitat loss",
+          ],
+          [
+            "Arctic warming twice as fast as global average",
+            "Loss of denning habitat in sea ice",
+            "Reduced access to traditional food sources",
+            "Increased energy expenditure for hunting",
+          ],
+          [
+            "Shrinking ice platforms for hunting",
+            "Changes in seal distribution and abundance",
+            "Longer ice-free seasons in Arctic waters",
+            "Competition for declining resources",
+          ],
         ];
-        threats.push(...arcticThreats[Math.floor(Math.random() * arcticThreats.length)]);
-      } else if (lowerHabitat.includes("marine") || lowerHabitat.includes("ocean") || lowerName.includes("whale") || lowerName.includes("turtle") || lowerName.includes("seal") || lowerName.includes("walrus")) {
+        threats.push(
+          ...arcticThreats[Math.floor(Math.random() * arcticThreats.length)]
+        );
+      } else if (
+        lowerHabitat.includes("marine") ||
+        lowerHabitat.includes("ocean") ||
+        lowerName.includes("whale") ||
+        lowerName.includes("turtle") ||
+        lowerName.includes("seal") ||
+        lowerName.includes("walrus")
+      ) {
         const marineThreats = [
-          ["Ocean warming and acidification", "Sea level changes affecting habitat", "Coral bleaching and ecosystem disruption", "Changes in ocean currents and temperature"],
-          ["Rising ocean temperatures affecting food chains", "Coral reef degradation from warming waters", "Ocean acidification weakening shells and skeletons", "Shifting prey distributions due to warming"],
-          ["Beach erosion from sea level rise", "Warming sand temperatures affecting hatchling sex ratios", "Jellyfish bloom changes from ocean warming", "Stronger storms destroying nesting sites"],
-          ["Marine heatwaves reducing food availability", "Ocean deoxygenation in warming waters", "Disrupted migration patterns from current changes", "Increased disease from warmer waters"]
+          [
+            "Ocean warming and acidification",
+            "Sea level changes affecting habitat",
+            "Coral bleaching and ecosystem disruption",
+            "Changes in ocean currents and temperature",
+          ],
+          [
+            "Rising ocean temperatures affecting food chains",
+            "Coral reef degradation from warming waters",
+            "Ocean acidification weakening shells and skeletons",
+            "Shifting prey distributions due to warming",
+          ],
+          [
+            "Beach erosion from sea level rise",
+            "Warming sand temperatures affecting hatchling sex ratios",
+            "Jellyfish bloom changes from ocean warming",
+            "Stronger storms destroying nesting sites",
+          ],
+          [
+            "Marine heatwaves reducing food availability",
+            "Ocean deoxygenation in warming waters",
+            "Disrupted migration patterns from current changes",
+            "Increased disease from warmer waters",
+          ],
         ];
-        threats.push(...marineThreats[Math.floor(Math.random() * marineThreats.length)]);
-      } else if (lowerHabitat.includes("mountain") || lowerHabitat.includes("alpine") || lowerName.includes("mountain") || lowerName.includes("pika") || lowerName.includes("lynx")) {
+        threats.push(
+          ...marineThreats[Math.floor(Math.random() * marineThreats.length)]
+        );
+      } else if (
+        lowerHabitat.includes("mountain") ||
+        lowerHabitat.includes("alpine") ||
+        lowerName.includes("mountain") ||
+        lowerName.includes("pika") ||
+        lowerName.includes("lynx")
+      ) {
         const mountainThreats = [
-          ["Warming temperatures pushing species to higher elevations", "Reduced snow cover and glacial melt", "Habitat fragmentation from climate shifts", "Changes in vegetation zones"],
-          ["Alpine habitats shrinking from warming", "Earlier snowmelt reducing summer water", "Cannot migrate higher as mountains top out", "Heat stress in warming mountain environments"],
-          ["Loss of alpine meadows to forest expansion", "Reduced snowpack affecting water sources", "Shifting vegetation zones reducing food", "Increased competition as habitats shrink"],
-          ["Glacial retreat eliminating cold refugia", "Changes in flowering times of food plants", "Reduced insulation from declining snowpack", "Fragmented populations in isolated peaks"]
+          [
+            "Warming temperatures pushing species to higher elevations",
+            "Reduced snow cover and glacial melt",
+            "Habitat fragmentation from climate shifts",
+            "Changes in vegetation zones",
+          ],
+          [
+            "Alpine habitats shrinking from warming",
+            "Earlier snowmelt reducing summer water",
+            "Cannot migrate higher as mountains top out",
+            "Heat stress in warming mountain environments",
+          ],
+          [
+            "Loss of alpine meadows to forest expansion",
+            "Reduced snowpack affecting water sources",
+            "Shifting vegetation zones reducing food",
+            "Increased competition as habitats shrink",
+          ],
+          [
+            "Glacial retreat eliminating cold refugia",
+            "Changes in flowering times of food plants",
+            "Reduced insulation from declining snowpack",
+            "Fragmented populations in isolated peaks",
+          ],
         ];
-        threats.push(...mountainThreats[Math.floor(Math.random() * mountainThreats.length)]);
-      } else if (lowerHabitat.includes("forest") || lowerHabitat.includes("woodland") || lowerName.includes("orangutan") || lowerName.includes("koala") || lowerName.includes("caribou")) {
+        threats.push(
+          ...mountainThreats[Math.floor(Math.random() * mountainThreats.length)]
+        );
+      } else if (
+        lowerHabitat.includes("forest") ||
+        lowerHabitat.includes("woodland") ||
+        lowerName.includes("orangutan") ||
+        lowerName.includes("koala") ||
+        lowerName.includes("caribou")
+      ) {
         const forestThreats = [
-          ["Increased frequency and intensity of wildfires", "Drought stress on forest ecosystems", "Changes in tree species composition", "Extreme heat events affecting habitat"],
-          ["Extended drought periods reducing food trees", "More intense bushfires destroying habitat", "Heat stress causing dehydration", "Declining nutritional quality of vegetation"],
-          ["Warmer temperatures enabling pest outbreaks", "Changing rainfall patterns affecting forests", "Increased fire risk from drier conditions", "Habitat loss from extreme weather events"],
-          ["Forest die-off from prolonged drought", "Shifts in plant phenology disrupting food supply", "More frequent catastrophic fires", "Temperature extremes exceeding tolerance"]
+          [
+            "Increased frequency and intensity of wildfires",
+            "Drought stress on forest ecosystems",
+            "Changes in tree species composition",
+            "Extreme heat events affecting habitat",
+          ],
+          [
+            "Extended drought periods reducing food trees",
+            "More intense bushfires destroying habitat",
+            "Heat stress causing dehydration",
+            "Declining nutritional quality of vegetation",
+          ],
+          [
+            "Warmer temperatures enabling pest outbreaks",
+            "Changing rainfall patterns affecting forests",
+            "Increased fire risk from drier conditions",
+            "Habitat loss from extreme weather events",
+          ],
+          [
+            "Forest die-off from prolonged drought",
+            "Shifts in plant phenology disrupting food supply",
+            "More frequent catastrophic fires",
+            "Temperature extremes exceeding tolerance",
+          ],
         ];
-        threats.push(...forestThreats[Math.floor(Math.random() * forestThreats.length)]);
-      } else if (lowerName.includes("bird") || lowerName.includes("penguin") || lowerName.includes("butterfly") || lowerName.includes("monarch")) {
+        threats.push(
+          ...forestThreats[Math.floor(Math.random() * forestThreats.length)]
+        );
+      } else if (
+        lowerName.includes("bird") ||
+        lowerName.includes("penguin") ||
+        lowerName.includes("butterfly") ||
+        lowerName.includes("monarch")
+      ) {
         const migratoryThreats = [
-          ["Altered seasonal patterns disrupting migration timing", "Changes in food availability along routes", "Extreme weather during migration", "Mismatched breeding and food peak times"],
-          ["Earlier spring arrival but food not yet available", "Stronger storms during migration journeys", "Shifting temperature cues for migration", "Breeding habitat changes at destination"],
-          ["Loss of stopover sites from habitat changes", "Extended migration distances due to range shifts", "Unpredictable weather patterns during travel", "Food scarcity at traditional breeding grounds"],
-          ["Temperature changes affecting migration cues", "Habitat loss at overwintering sites", "Extreme weather events during vulnerable periods", "Declining insect populations reducing food"]
+          [
+            "Altered seasonal patterns disrupting migration timing",
+            "Changes in food availability along routes",
+            "Extreme weather during migration",
+            "Mismatched breeding and food peak times",
+          ],
+          [
+            "Earlier spring arrival but food not yet available",
+            "Stronger storms during migration journeys",
+            "Shifting temperature cues for migration",
+            "Breeding habitat changes at destination",
+          ],
+          [
+            "Loss of stopover sites from habitat changes",
+            "Extended migration distances due to range shifts",
+            "Unpredictable weather patterns during travel",
+            "Food scarcity at traditional breeding grounds",
+          ],
+          [
+            "Temperature changes affecting migration cues",
+            "Habitat loss at overwintering sites",
+            "Extreme weather events during vulnerable periods",
+            "Declining insect populations reducing food",
+          ],
         ];
-        threats.push(...migratoryThreats[Math.floor(Math.random() * migratoryThreats.length)]);
-      } else if (lowerHabitat.includes("tundra") || lowerHabitat.includes("taiga") || lowerName.includes("fox") || lowerName.includes("caribou")) {
+        threats.push(
+          ...migratoryThreats[
+            Math.floor(Math.random() * migratoryThreats.length)
+          ]
+        );
+      } else if (
+        lowerHabitat.includes("tundra") ||
+        lowerHabitat.includes("taiga") ||
+        lowerName.includes("fox") ||
+        lowerName.includes("caribou")
+      ) {
         const tundraThreats = [
-          ["Permafrost thawing altering landscape", "Shrub expansion replacing tundra", "Changes in lemming and prey cycles", "Warmer winters reducing snow insulation"],
-          ["Tundra greening from warming temperatures", "Earlier snowmelt changing vegetation", "Competition from species moving northward", "Loss of traditional denning sites"],
-          ["Reduced snow cover affecting camouflage", "Changes in plant growth timing", "Warming allowing competitor species to invade", "Altered prey population dynamics"],
-          ["Thawing ground creating unstable terrain", "Vegetation changes reducing food quality", "Extended growing season benefiting competitors", "Loss of cold-adapted prey species"]
+          [
+            "Permafrost thawing altering landscape",
+            "Shrub expansion replacing tundra",
+            "Changes in lemming and prey cycles",
+            "Warmer winters reducing snow insulation",
+          ],
+          [
+            "Tundra greening from warming temperatures",
+            "Earlier snowmelt changing vegetation",
+            "Competition from species moving northward",
+            "Loss of traditional denning sites",
+          ],
+          [
+            "Reduced snow cover affecting camouflage",
+            "Changes in plant growth timing",
+            "Warming allowing competitor species to invade",
+            "Altered prey population dynamics",
+          ],
+          [
+            "Thawing ground creating unstable terrain",
+            "Vegetation changes reducing food quality",
+            "Extended growing season benefiting competitors",
+            "Loss of cold-adapted prey species",
+          ],
         ];
-        threats.push(...tundraThreats[Math.floor(Math.random() * tundraThreats.length)]);
+        threats.push(
+          ...tundraThreats[Math.floor(Math.random() * tundraThreats.length)]
+        );
       } else {
         // More specific generic climate threats based on species type
         const genericThreatSets = [
-          ["Rising temperatures affecting habitat suitability", "Increased frequency of extreme weather events", "Shifts in precipitation patterns", "Changes in food availability and distribution"],
-          ["Habitat degradation from climate variability", "Altered ecosystem interactions from warming", "Range contractions due to temperature changes", "Phenological mismatches with food sources"],
-          ["Climate-driven habitat loss and fragmentation", "Temperature extremes exceeding tolerance limits", "Changing seasonal patterns disrupting life cycles", "Reduced reproductive success from climate stress"],
-          ["Warming temperatures enabling disease spread", "Drought and flooding affecting habitat quality", "Competition from climate-favored species", "Loss of climate refugia from rapid change"],
-          ["Ecosystem shifts from changing climate conditions", "Extreme events increasing mortality rates", "Food web disruptions from warming", "Habitat compression from multiple stressors"]
+          [
+            "Rising temperatures affecting habitat suitability",
+            "Increased frequency of extreme weather events",
+            "Shifts in precipitation patterns",
+            "Changes in food availability and distribution",
+          ],
+          [
+            "Habitat degradation from climate variability",
+            "Altered ecosystem interactions from warming",
+            "Range contractions due to temperature changes",
+            "Phenological mismatches with food sources",
+          ],
+          [
+            "Climate-driven habitat loss and fragmentation",
+            "Temperature extremes exceeding tolerance limits",
+            "Changing seasonal patterns disrupting life cycles",
+            "Reduced reproductive success from climate stress",
+          ],
+          [
+            "Warming temperatures enabling disease spread",
+            "Drought and flooding affecting habitat quality",
+            "Competition from climate-favored species",
+            "Loss of climate refugia from rapid change",
+          ],
+          [
+            "Ecosystem shifts from changing climate conditions",
+            "Extreme events increasing mortality rates",
+            "Food web disruptions from warming",
+            "Habitat compression from multiple stressors",
+          ],
         ];
-        threats.push(...genericThreatSets[Math.floor(Math.random() * genericThreatSets.length)]);
+        threats.push(
+          ...genericThreatSets[
+            Math.floor(Math.random() * genericThreatSets.length)
+          ]
+        );
       }
     }
 
@@ -562,7 +775,7 @@ async function fetchFromNatureServe() {
     // Generate estimated population based on conservation status if still no data
     if (!population) {
       const statusCode = possibleStatus?.toString().toUpperCase() || "";
-      
+
       if (statusCode.includes("GX") || statusCode.includes("EXTINCT")) {
         population = "Extinct in the wild";
       } else if (statusCode.includes("G1") || status.includes("Critically")) {
@@ -571,18 +784,24 @@ async function fetchFromNatureServe() {
           "Fewer than 2,500 individuals",
           "Less than 1,000 breeding pairs",
           "Estimated 500-2,000 remaining",
-          "Critically low: < 2,500 mature individuals"
+          "Critically low: < 2,500 mature individuals",
         ];
-        population = criticalEstimates[Math.floor(Math.random() * criticalEstimates.length)];
+        population =
+          criticalEstimates[
+            Math.floor(Math.random() * criticalEstimates.length)
+          ];
       } else if (statusCode.includes("G2") || status.includes("Imperiled")) {
         // Vary imperiled populations
         const imperiledEstimates = [
           "2,500 - 10,000 individuals",
           "Approximately 3,000-8,000 mature animals",
           "Estimated 5,000-15,000 globally",
-          "Declining: 4,000-12,000 remaining"
+          "Declining: 4,000-12,000 remaining",
         ];
-        population = imperiledEstimates[Math.floor(Math.random() * imperiledEstimates.length)];
+        population =
+          imperiledEstimates[
+            Math.floor(Math.random() * imperiledEstimates.length)
+          ];
       } else if (statusCode.includes("G3") || status.includes("Vulnerable")) {
         // Vary vulnerable populations
         const vulnerableEstimates = [
@@ -590,65 +809,103 @@ async function fetchFromNatureServe() {
           "Approximately 25,000-75,000 globally",
           "Estimated 50,000+ with declining trend",
           "60,000-80,000 across native range",
-          "Stable at ~40,000 individuals"
+          "Stable at ~40,000 individuals",
         ];
-        population = vulnerableEstimates[Math.floor(Math.random() * vulnerableEstimates.length)];
+        population =
+          vulnerableEstimates[
+            Math.floor(Math.random() * vulnerableEstimates.length)
+          ];
       } else if (statusCode.includes("G4") || status.includes("Apparently")) {
         // Vary apparently secure populations
         const secureEstimates = [
           "100,000+ individuals",
           "Stable population: 150,000-200,000",
           "200,000+ with regional declines",
-          "Approximately 250,000 globally"
+          "Approximately 250,000 globally",
         ];
-        population = secureEstimates[Math.floor(Math.random() * secureEstimates.length)];
+        population =
+          secureEstimates[Math.floor(Math.random() * secureEstimates.length)];
       } else {
         // Use habitat type and species name to generate varied estimates
         const habitat = species.habitat || species.habitatComments || "";
         const lowerHabitat = habitat.toLowerCase();
         const lowerName = speciesName.toLowerCase();
-        
-        if (lowerHabitat.includes("arctic") || lowerHabitat.includes("polar") || lowerName.includes("polar") || lowerName.includes("arctic")) {
+
+        if (
+          lowerHabitat.includes("arctic") ||
+          lowerHabitat.includes("polar") ||
+          lowerName.includes("polar") ||
+          lowerName.includes("arctic")
+        ) {
           const arcticEstimates = [
             "22,000-31,000 across Arctic region",
             "Declining Arctic population: ~25,000",
             "Estimated 15,000-20,000 individuals",
-            "20,000+ with habitat loss concerns"
+            "20,000+ with habitat loss concerns",
           ];
-          population = arcticEstimates[Math.floor(Math.random() * arcticEstimates.length)];
-        } else if (lowerHabitat.includes("marine") || lowerHabitat.includes("ocean") || lowerName.includes("whale") || lowerName.includes("turtle") || lowerName.includes("seal")) {
+          population =
+            arcticEstimates[Math.floor(Math.random() * arcticEstimates.length)];
+        } else if (
+          lowerHabitat.includes("marine") ||
+          lowerHabitat.includes("ocean") ||
+          lowerName.includes("whale") ||
+          lowerName.includes("turtle") ||
+          lowerName.includes("seal")
+        ) {
           const marineEstimates = [
             "Oceanic population: 80,000-120,000",
             "Estimated 50,000+ across oceans",
             "Marine population declining: ~65,000",
             "Global estimate: 100,000-150,000",
-            "35,000-45,000 breeding adults"
+            "35,000-45,000 breeding adults",
           ];
-          population = marineEstimates[Math.floor(Math.random() * marineEstimates.length)];
-        } else if (lowerHabitat.includes("mountain") || lowerHabitat.includes("alpine") || lowerName.includes("mountain") || lowerName.includes("pika")) {
+          population =
+            marineEstimates[Math.floor(Math.random() * marineEstimates.length)];
+        } else if (
+          lowerHabitat.includes("mountain") ||
+          lowerHabitat.includes("alpine") ||
+          lowerName.includes("mountain") ||
+          lowerName.includes("pika")
+        ) {
           const mountainEstimates = [
             "Mountain populations: 30,000-50,000",
             "Alpine habitat declining: ~25,000",
             "Estimated 15,000-40,000 individuals",
-            "Fragmented populations: 35,000 total"
+            "Fragmented populations: 35,000 total",
           ];
-          population = mountainEstimates[Math.floor(Math.random() * mountainEstimates.length)];
-        } else if (lowerName.includes("bird") || lowerName.includes("butterfly") || lowerName.includes("monarch")) {
+          population =
+            mountainEstimates[
+              Math.floor(Math.random() * mountainEstimates.length)
+            ];
+        } else if (
+          lowerName.includes("bird") ||
+          lowerName.includes("butterfly") ||
+          lowerName.includes("monarch")
+        ) {
           const birdEstimates = [
             "Migration counts: 40-60 million",
             "Breeding population: 2-3 million pairs",
             "85% decline since 1990s",
-            "Estimated 10-20 million individuals"
+            "Estimated 10-20 million individuals",
           ];
-          population = birdEstimates[Math.floor(Math.random() * birdEstimates.length)];
-        } else if (lowerName.includes("fox") || lowerName.includes("wolf") || lowerName.includes("lynx") || lowerName.includes("cat")) {
+          population =
+            birdEstimates[Math.floor(Math.random() * birdEstimates.length)];
+        } else if (
+          lowerName.includes("fox") ||
+          lowerName.includes("wolf") ||
+          lowerName.includes("lynx") ||
+          lowerName.includes("cat")
+        ) {
           const predatorEstimates = [
             "Several thousand across range",
             "Estimated 5,000-10,000 individuals",
             "Regional populations: 8,000-12,000",
-            "Stable at ~7,500 mature animals"
+            "Stable at ~7,500 mature animals",
           ];
-          population = predatorEstimates[Math.floor(Math.random() * predatorEstimates.length)];
+          population =
+            predatorEstimates[
+              Math.floor(Math.random() * predatorEstimates.length)
+            ];
         } else {
           // Generic varied estimates
           const genericEstimates = [
@@ -657,12 +914,15 @@ async function fetchFromNatureServe() {
             "Monitoring shows stable numbers",
             "Regional populations vary widely",
             "Conservation dependent: 20,000+",
-            "Approximately 40,000-60,000 individuals"
+            "Approximately 40,000-60,000 individuals",
           ];
-          population = genericEstimates[Math.floor(Math.random() * genericEstimates.length)];
+          population =
+            genericEstimates[
+              Math.floor(Math.random() * genericEstimates.length)
+            ];
         }
       }
-      
+
       console.log(`📊 Generated estimated population: ${population}`);
     }
 
