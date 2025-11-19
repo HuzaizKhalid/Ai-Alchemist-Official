@@ -276,39 +276,48 @@ export function ClimateWidget({ carbonEmissions }: ClimateWidgetProps) {
           )}
 
           {userTrees.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {userTrees.map((tree, index) => (
-                <div
-                  key={tree.id}
-                  className="bg-slate-900/50 rounded-lg p-3 border border-slate-600"
-                >
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-2">
-                      <TreePine className="w-4 h-4 text-green-400" />
-                      <span className="text-white text-sm font-medium">
-                        Tree #{index + 1}
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-80 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-slate-600 scrollbar-track-slate-800">
+                {userTrees.map((tree, index) => (
+                  <div
+                    key={tree.id}
+                    className="bg-slate-900/50 rounded-lg p-3 border border-slate-600"
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <TreePine className="w-4 h-4 text-green-400" />
+                        <span className="text-white text-sm font-medium">
+                          Tree #{index + 1}
+                        </span>
+                      </div>
+                      <span className="text-green-400 font-bold text-lg">
+                        {formatTreeAge(tree.ageInDays)}
                       </span>
                     </div>
-                    <span className="text-green-400 font-bold text-lg">
-                      {formatTreeAge(tree.ageInDays)}
-                    </span>
+                    <div className="flex items-center justify-between">
+                      <p className="text-white/60 text-xs">
+                        CO₂ absorbed: {tree.cumulativeOffset.toFixed(2)} kg
+                      </p>
+                      <Button
+                        onClick={() => removeTree(tree.id)}
+                        size="sm"
+                        variant="ghost"
+                        className="text-red-400 hover:text-red-300 hover:bg-red-500/20 h-6 w-6 p-0"
+                      >
+                        <Minus className="w-3 h-3" />
+                      </Button>
+                    </div>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <p className="text-white/60 text-xs">
-                      CO₂ absorbed: {tree.cumulativeOffset.toFixed(2)} kg
-                    </p>
-                    <Button
-                      onClick={() => removeTree(tree.id)}
-                      size="sm"
-                      variant="ghost"
-                      className="text-red-400 hover:text-red-300 hover:bg-red-500/20 h-6 w-6 p-0"
-                    >
-                      <Minus className="w-3 h-3" />
-                    </Button>
-                  </div>
+                ))}
+              </div>
+              {userTrees.length > 4 && (
+                <div className="text-center mt-2">
+                  <p className="text-white/40 text-xs italic">
+                    Scroll to view all {userTrees.length} trees 👆
+                  </p>
                 </div>
-              ))}
-            </div>
+              )}
+            </>
           ) : (
             <div className="text-center py-6 text-white/60 bg-slate-900/30 rounded-lg">
               <TreePine className="w-8 h-8 mx-auto mb-2 opacity-50" />
@@ -320,9 +329,9 @@ export function ClimateWidget({ carbonEmissions }: ClimateWidgetProps) {
 
         {/* Temperature Section - Bottom Part */}
         <div>
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-white font-semibold flex items-center gap-2">
-              <ThermometerSun className="w-5 h-5 text-orange-400" />
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+            <h3 className="text-white font-semibold flex items-center gap-2 text-sm sm:text-base">
+              <ThermometerSun className="w-4 h-4 sm:w-5 sm:h-5 text-orange-400" />
               Paris Agreement Target
             </h3>
             <Button
@@ -330,10 +339,12 @@ export function ClimateWidget({ carbonEmissions }: ClimateWidgetProps) {
               disabled={refreshing}
               size="sm"
               variant="outline"
-              className="bg-blue-500/20 border-blue-500/50 hover:bg-blue-500/30 text-blue-300"
+              className="bg-blue-500/20 border-blue-500/50 hover:bg-blue-500/30 text-blue-300 w-full sm:w-auto text-xs sm:text-sm"
             >
               <RefreshCw
-                className={`w-4 h-4 mr-1 ${refreshing ? "animate-spin" : ""}`}
+                className={`w-3 h-3 sm:w-4 sm:h-4 mr-1 ${
+                  refreshing ? "animate-spin" : ""
+                }`}
               />
               {refreshing ? "Updating..." : "Refresh"}
             </Button>
@@ -341,29 +352,43 @@ export function ClimateWidget({ carbonEmissions }: ClimateWidgetProps) {
 
           {/* Data Source Info */}
           {climateData.source && (
-            <div className="mb-4 p-2 bg-slate-900/30 rounded-lg">
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-white/60">
+            <div className="mb-4 p-2.5 sm:p-3 bg-slate-900/30 rounded-lg">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5 sm:gap-2">
+                <span className="text-white/60 text-[11px] sm:text-xs">
                   {climateData.isRealTime ? (
-                    <span className="flex items-center gap-1">
-                      <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-                      Live Data
+                    <span className="flex items-center gap-1.5">
+                      <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse flex-shrink-0"></span>
+                      <span className="font-medium">Live Data</span>
                     </span>
                   ) : (
-                    <span className="flex items-center gap-1">
-                      <span className="w-2 h-2 bg-yellow-400 rounded-full"></span>
-                      Static Data
+                    <span className="flex items-center gap-1.5">
+                      <span className="w-2 h-2 bg-yellow-400 rounded-full flex-shrink-0"></span>
+                      <span className="font-medium">Static Data</span>
                     </span>
                   )}
                 </span>
-                <span className="text-white/50 text-[10px]">
+                <span className="text-white/50 text-[10px] sm:text-xs line-clamp-2 sm:line-clamp-1">
                   {climateData.source}
                 </span>
               </div>
               {climateData.lastUpdated && (
-                <p className="text-white/40 text-[10px] mt-1">
+                <p className="text-white/40 text-[10px] sm:text-xs mt-1.5">
                   Last updated:{" "}
-                  {new Date(climateData.lastUpdated).toLocaleString()}
+                  {(() => {
+                    try {
+                      const date = new Date(climateData.lastUpdated);
+                      if (isNaN(date.getTime())) {
+                        return climateData.lastUpdated;
+                      }
+                      return date.toLocaleDateString("en-US", {
+                        year: "numeric",
+                        month: "short",
+                        day: "numeric",
+                      });
+                    } catch (e) {
+                      return climateData.lastUpdated;
+                    }
+                  })()}
                 </p>
               )}
             </div>
@@ -371,9 +396,9 @@ export function ClimateWidget({ carbonEmissions }: ClimateWidgetProps) {
 
           {/* Status Badge */}
           <div className="flex justify-between items-center mb-4">
-            <span className="text-white/80 text-sm">Status</span>
+            <span className="text-white/80 text-xs sm:text-sm">Status</span>
             <span
-              className={`px-3 py-1 rounded-full text-xs font-semibold border ${getStatusColor(
+              className={`px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-semibold border ${getStatusColor(
                 climateData.status
               )}`}
             >
@@ -382,77 +407,44 @@ export function ClimateWidget({ carbonEmissions }: ClimateWidgetProps) {
           </div>
 
           {/* Temperature Display */}
-          <div className="grid grid-cols-2 gap-4 mb-4">
-            <div className="text-center p-4 bg-slate-900/50 rounded-lg border border-slate-600">
-              <p className="text-sm text-white/60 mb-1">CURRENT</p>
-              <p className="text-3xl font-bold text-orange-400">
+          <div className="grid grid-cols-2 gap-2.5 sm:gap-3 lg:gap-4 mb-4">
+            <div className="text-center p-2.5 sm:p-3 lg:p-4 bg-slate-900/50 rounded-lg border border-slate-600">
+              <p className="text-[10px] sm:text-xs lg:text-sm text-white/60 mb-0.5 sm:mb-1 font-medium">
+                CURRENT
+              </p>
+              <p className="text-lg sm:text-xl lg:text-2xl xl:text-3xl font-bold text-orange-400 leading-tight">
                 +{climateData.currentTemp.toFixed(2)}°C
               </p>
             </div>
-            <div className="text-center p-4 bg-slate-900/50 rounded-lg border border-slate-600">
-              <p className="text-sm text-white/60 mb-1">TARGET</p>
-              <p className="text-3xl font-bold text-blue-400">
+            <div className="text-center p-2.5 sm:p-3 lg:p-4 bg-slate-900/50 rounded-lg border border-slate-600">
+              <p className="text-[10px] sm:text-xs lg:text-sm text-white/60 mb-0.5 sm:mb-1 font-medium">
+                TARGET
+              </p>
+              <p className="text-lg sm:text-xl lg:text-2xl xl:text-3xl font-bold text-blue-400 leading-tight">
                 +{climateData.targetTemp.toFixed(1)}°C
               </p>
             </div>
           </div>
 
           {/* Difference Display */}
-          <div className="bg-gradient-to-r from-orange-900/30 to-red-900/30 rounded-lg p-4 border border-orange-500/30">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-white/80 flex items-center gap-2">
-                <TrendingUp className="w-4 h-4 text-orange-400" />
-                Difference from target:
+          <div className="bg-gradient-to-r from-orange-900/30 to-red-900/30 rounded-lg p-3 sm:p-4 border border-orange-500/30">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5 sm:gap-2 mb-2">
+              <span className="text-white/80 flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm">
+                <TrendingUp className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-orange-400 flex-shrink-0" />
+                <span>Difference from target:</span>
               </span>
-              <span className="text-orange-400 font-bold text-xl">
+              <span className="text-orange-400 font-bold text-xl sm:text-2xl">
                 +{Math.abs(climateData.difference).toFixed(2)}°C
               </span>
             </div>
-            <p className="text-white/70 text-sm">
+            <p className="text-white/70 text-xs sm:text-sm">
               {climateData.percentOfLimit.toFixed(1)}% of the 1.5°C limit
             </p>
           </div>
 
           {/* Temperature Scale */}
-          <div className="mt-4">
-            <p className="text-white/80 text-sm mb-2">Temperature Scale</p>
-            <div className="relative">
-              {/* Gradient bar */}
-              <div className="h-8 rounded-lg bg-gradient-to-r from-green-500 via-yellow-500 to-red-500 relative">
-                {/* Marker for current temperature */}
-                <div
-                  className="absolute top-0 bottom-0 w-1 bg-white"
-                  style={{
-                    left: `${(climateData.currentTemp / 2.5) * 100}%`,
-                  }}
-                >
-                  <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-b-4 border-transparent border-b-white"></div>
-                </div>
-              </div>
-
-              {/* Scale labels */}
-              <div className="flex justify-between mt-1 text-xs text-white/60">
-                <span>0°C</span>
-                <span>1.5°C</span>
-                <span>2.0°C</span>
-                <span>2.5°C</span>
-              </div>
-
-              {/* Legend */}
-              <div className="mt-3 flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                <span className="text-xs text-white/70">
-                  Below 1.0°C - Safe zone
-                </span>
-              </div>
-            </div>
-          </div>
 
           {/* Info text */}
-          <p className="text-white/60 text-xs mt-4 italic">
-            The Paris Agreement aims to limit global temperature rise to well
-            below 2°C, preferably to 1.5°C, compared to pre-industrial levels.
-          </p>
         </div>
       </CardContent>
     </Card>

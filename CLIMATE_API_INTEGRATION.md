@@ -86,8 +86,8 @@ const data = await response.json();
   difference: -0.12,
   percentOfLimit: 92.0,
   status: "Warning",
-  lastUpdated: "2024-11-18T...",
-  source: "Climate Change API (global-warming.org)",
+  lastUpdated: "2025-01-15",
+  source: "Copernicus Climate Pulse (ERA5, ~2 days behind)",
   isRealTime: true
 }
 ```
@@ -105,9 +105,27 @@ if (currentTemp < 1.0) {
 }
 ```
 
-## Alternative APIs (Future Enhancement)
+## Alternative APIs
 
-If you want to use other climate data sources, here are alternatives:
+### Currently Implemented
+
+1. **Copernicus Climate Pulse (Primary)** ✅
+
+   - Website: https://pulse.climate.copernicus.eu/
+   - Free, no authentication
+   - ERA5 reanalysis dataset
+   - ~2 days behind real-time
+   - Highly accurate and reliable
+
+2. **Global Warming API (Backup)** ✅
+   - Website: https://global-warming.org/
+   - Free, no authentication
+   - Regular updates
+   - Used when Copernicus is unavailable
+
+### Future Enhancement Options
+
+If you want to add more data sources:
 
 ### 1. **Berkeley Earth API**
 
@@ -121,11 +139,17 @@ If you want to use other climate data sources, here are alternatives:
 - Official NASA climate data
 - Requires data file parsing
 
-### 3. **NOAA Climate Data Online**
+### 2. **NOAA Climate Data Online**
 
 - Website: https://www.ncdc.noaa.gov/cdo-web/
 - Requires API token (free registration)
 - More detailed climate metrics
+
+### 3. **Berkeley Earth API**
+
+- Website: http://berkeleyearth.org/
+- Free data downloads available
+- Comprehensive temperature datasets
 
 ### 4. **Climate.gov API**
 
@@ -191,12 +215,14 @@ Successfully fetched real-time climate data: {
 
 ## Benefits
 
-✅ **Real-time Data**: Always shows current global temperature  
+✅ **Near Real-time Data**: Copernicus ERA5 is only ~2 days behind  
+✅ **High Accuracy**: ERA5 is one of the most accurate climate reanalysis datasets  
+✅ **Official Source**: Data from European Union's Copernicus Programme  
 ✅ **No API Keys**: Free to use, no authentication needed  
-✅ **Automatic Updates**: Fetches latest data on component load  
+✅ **Automatic Fallback**: Dual API system ensures reliability  
 ✅ **Manual Refresh**: Users can update data on demand  
-✅ **Reliable Fallback**: Static data ensures widget always works  
-✅ **User Transparency**: Shows data source and update time
+✅ **User Transparency**: Shows data source and update time  
+✅ **Redundancy**: Two independent data sources prevent downtime
 
 ## Future Enhancements
 
