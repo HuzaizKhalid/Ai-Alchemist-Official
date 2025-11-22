@@ -11,6 +11,7 @@ import { Spotlight } from "@/components/ui/spotlight-new";
 import { BackgroundBeams } from "@/components/ui/background-beams";
 import ProviderWrapper from "@/lib/ProviderWrapper";
 import { Toaster } from "@/components/ui/sonner";
+import Script from "next/script";
 
 const inter = Inter({ subsets: ["latin"] });
 

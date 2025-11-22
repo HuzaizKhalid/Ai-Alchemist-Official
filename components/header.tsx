@@ -303,6 +303,10 @@ export function Header() {
                 <DollarSign className="w-5 h-5 text-emerald-400 drop-shadow-sm" />
                 <span className="drop-shadow-sm">Vote</span>
               </NavLink>
+              <NavLink href="/feedback">
+                <Contact className="w-5 h-5 text-emerald-400 drop-shadow-sm" />
+                <span className="drop-shadow-sm">Feedback</span>
+              </NavLink>
               {/* Added Tree Program Link to Menu */}
               <NavLink href="/contact-us">
                 <Contact className="w-5 h-5 text-emerald-400 drop-shadow-sm" />

@@ -13,6 +13,7 @@ import {
   Share2,
   Copy,
   Check,
+  MessageSquare,
 } from "lucide-react";
 import Image from "next/image";
 import ReactMarkdown from "react-markdown";
@@ -582,6 +583,17 @@ export function SearchResults({ results, isHome = false }: SearchResultsProps) {
               {isSharing ? "Creating link..." : "Share this conversation"}
             </Button>
           )}
+
+          {/* Feedback Button */}
+          <Button
+            onClick={() => (window.location.href = "/feedback")}
+            variant="outline"
+            size="default"
+            className="bg-emerald-500/20 border-emerald-500/50 hover:bg-emerald-500/30 text-emerald-300 hover:text-emerald-200 flex items-center gap-2 px-6 py-3"
+          >
+            <MessageSquare className="w-5 h-5" />
+            Give Feedback
+          </Button>
         </div>
       </div>
 
