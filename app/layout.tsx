@@ -93,6 +93,27 @@ export default function RootLayout({
             {/* </AuthProvider> */}
           </ThemeProvider>
         </ClientLayout>
+
+        {/* Featurebase Feedback Widget */}
+        <Script
+          id="featurebase-sdk"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function(w,d,s,o,f,js,fjs){
+                w['FeaturebaseWidget']=o;w[o] = w[o] || function () { (w[o].q = w[o].q || []).push(arguments) };
+                js = d.createElement(s), fjs = d.getElementsByTagName(s)[0];
+                js.id = o; js.src = f; js.async = 1; fjs.parentNode.insertBefore(js, fjs);
+              }(window, document, 'script', 'Featurebase', 'https://do.featurebase.app/js/sdk.js'));
+              
+              Featurebase('initialize_feedback_widget', {
+                organization: 'aichemist',
+                theme: 'dark',
+                placement: 'right'
+              });
+            `,
+          }}
+        />
       </body>
     </html>
   );

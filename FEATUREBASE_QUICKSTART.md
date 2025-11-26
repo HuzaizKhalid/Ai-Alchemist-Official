@@ -1,92 +1,58 @@
 # Featurebase Quick Start Guide 🚀
 
-## Step-by-Step Implementation
+## ⚡ 3-Minute Setup
 
-### ✅ What's Already Done
+### 1. Create Featurebase Account
 
-1. ✅ Feedback page created at `/feedback`
-2. ✅ API route for programmatic submission at `/api/feedback`
-3. ✅ "Give Feedback" button added to search results
-4. ✅ Feedback link added to navigation menu
-5. ✅ Featurebase SDK integration in layout
-6. ✅ Custom feedback form component created
+1. Visit [featurebase.app](https://www.featurebase.app)
+2. Sign up and create an organization
+3. Choose your organization name (e.g., `alchemist-ai`)
 
-### 🔧 What You Need To Do
+### 2. Get Your Organization Name
 
-#### 1. Create Featurebase Account (5 minutes)
+1. Go to Settings → Embed & API
+2. Copy your organization name
 
-1. Go to https://featurebase.app
-2. Click "Sign Up" and create an account
-3. Create a new organization (e.g., "Alchemist AI")
-4. Complete the quick setup wizard
+### 3. Update Configuration Files
 
-#### 2. Get Your Credentials (2 minutes)
-
-1. In Featurebase dashboard, go to **Settings** → **Embed & API**
-2. Copy your **Organization ID** (looks like: `alchemist-ai` or `your-org-name`)
-3. Click "Generate API Key" and copy it
-4. Keep these safe for the next step
-
-#### 3. Add Environment Variables (1 minute)
-
-Create or update `.env.local` file in your project root:
+**Update `.env.local`:**
 
 ```bash
-# Featurebase Configuration
-NEXT_PUBLIC_FEATUREBASE_ORG_ID=your-org-id-here
-FEATUREBASE_API_KEY=your-secret-api-key-here
+NEXT_PUBLIC_FEATUREBASE_ORG=your-org-name
 ```
 
-**Replace:**
+**Update `app/layout.tsx` (line ~85):**
 
-- `your-org-id-here` with your actual Organization ID
-- `your-secret-api-key-here` with your actual API Key
+```javascript
+organization: 'your-org-name', // ← Change this from 'alchemist-ai'
+```
 
-⚠️ **Never commit `.env.local` to git!**
+**Update `app/feedback/page.tsx` (line ~100):**
 
-#### 4. Restart Development Server
+```tsx
+src = "https://your-org-name.featurebase.app/board";
+```
+
+### 4. Test It
 
 ```bash
-# Stop the current server (Ctrl+C)
-# Then restart:
 npm run dev
 ```
 
-#### 5. Test the Integration (3 minutes)
+Visit http://localhost:3000 → Look for floating feedback button
 
-**Test 1: Feedback Page**
+---
 
-- Navigate to http://localhost:3000/feedback
-- Click "Open Feedback Form" button
-- Submit a test feedback
+## ✅ What's Already Integrated
 
-**Test 2: Navigation Menu**
+1. ✅ Floating feedback widget (appears on all pages)
+2. ✅ Full feedback page at `/feedback`
+3. ✅ Embedded feedback board with voting
+4. ✅ Reusable React components
+5. ✅ Dark theme matching your app
+6. ✅ Feedback link in navigation menu
 
-- Open the hamburger menu
-- Click "Feedback"
-- Verify the page loads
-
-**Test 3: Search Results Button**
-
-- Perform a search
-- Scroll to bottom of results
-- Click "Give Feedback" button
-
-**Test 4: Floating Widget** (appears on all pages)
-
-- Look for the floating feedback button on the right side
-- Click it to open the widget
-- Submit feedback
-
-**Test 5: API Route**
-
-- Go to `/feedback` page
-- Use the custom feedback form
-- Check if submission works
-
-### 📝 Customize Your Board (Optional)
-
-In Featurebase Dashboard:
+---
 
 1. **Add Categories:**
 

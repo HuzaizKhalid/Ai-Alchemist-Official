@@ -1,80 +1,38 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { MessageSquare, ArrowLeft, Send, Mail } from "lucide-react";
-import { toast } from "sonner";
+import {
+  MessageSquare,
+  ArrowLeft,
+  ExternalLink,
+  Lightbulb,
+  Bug,
+  HelpCircle,
+} from "lucide-react";
 
 const Page = () => {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [formData, setFormData] = useState({
-    email: "",
-    subject: "",
-    message: "",
-  });
+  const [isFeaturebaseReady, setIsFeaturebaseReady] = useState(false);
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (
-      !formData.email.trim() ||
-      !formData.subject.trim() ||
-      !formData.message.trim()
-    ) {
-      toast.error("Please fill in all fields");
-      return;
-    }
-
-    // Basic email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.email)) {
-      toast.error("Please enter a valid email address");
-      return;
-    }
-
-    setIsSubmitting(true);
-
-    try {
-      const response = await fetch("/api/feedback", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
-
-      const result = await response.json();
-
-      if (response.ok) {
-        toast.success(
-          "Feedback submitted successfully! We'll get back to you soon."
-        );
-        setFormData({
-          email: "",
-          subject: "",
-          message: "",
-        });
-      } else {
-        toast.error(result.error || "Failed to submit feedback");
+  useEffect(() => {
+    // Check if Featurebase is loaded
+    const checkFeaturebase = () => {
+      if (typeof window !== "undefined" && (window as any).Featurebase) {
+        setIsFeaturebaseReady(true);
       }
-    } catch (error) {
-      console.error("Error submitting feedback:", error);
-      toast.error("An error occurred. Please try again.");
-    } finally {
-      setIsSubmitting(false);
+    };
+
+    checkFeaturebase();
+    // Retry check in case script is still loading
+    const timer = setTimeout(checkFeaturebase, 1000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const openFeaturebaseWidget = () => {
+    if (typeof window !== "undefined" && (window as any).Featurebase) {
+      (window as any).Featurebase("open_feedback_widget");
     }
   };
 
@@ -102,144 +60,144 @@ const Page = () => {
         {/* Main Content */}
         <div className="grid md:grid-cols-3 gap-6 mb-8">
           {/* Info Cards */}
-          <Card className="bg-slate-800/50 border-slate-700 hover:border-emerald-500/50 transition-colors">
+          <Card
+            className="bg-slate-800/50 border-slate-700 hover:border-emerald-500/50 transition-colors cursor-pointer"
+            onClick={openFeaturebaseWidget}
+          >
             <CardContent className="pt-6 text-center">
-              <MessageSquare className="w-12 h-12 text-emerald-400 mx-auto mb-3" />
-              <h3 className="text-white font-semibold mb-2">Share Ideas</h3>
+              <Lightbulb className="w-12 h-12 text-emerald-400 mx-auto mb-3" />
+              <h3 className="text-white font-semibold mb-2">
+                Feature Requests
+              </h3>
               <p className="text-slate-400 text-sm">
-                Suggest features and improvements
+                Suggest new features and vote on ideas
               </p>
             </CardContent>
           </Card>
 
-          <Card className="bg-slate-800/50 border-slate-700 hover:border-emerald-500/50 transition-colors">
+          <Card
+            className="bg-slate-800/50 border-slate-700 hover:border-emerald-500/50 transition-colors cursor-pointer"
+            onClick={openFeaturebaseWidget}
+          >
             <CardContent className="pt-6 text-center">
-              <Mail className="w-12 h-12 text-emerald-400 mx-auto mb-3" />
-              <h3 className="text-white font-semibold mb-2">Report Issues</h3>
+              <Bug className="w-12 h-12 text-emerald-400 mx-auto mb-3" />
+              <h3 className="text-white font-semibold mb-2">Report Bugs</h3>
               <p className="text-slate-400 text-sm">
-                Let us know about bugs and problems
+                Let us know about issues you encounter
               </p>
             </CardContent>
           </Card>
 
-          <Card className="bg-slate-800/50 border-slate-700 hover:border-emerald-500/50 transition-colors">
+          <Card
+            className="bg-slate-800/50 border-slate-700 hover:border-emerald-500/50 transition-colors cursor-pointer"
+            onClick={openFeaturebaseWidget}
+          >
             <CardContent className="pt-6 text-center">
-              <Send className="w-12 h-12 text-emerald-400 mx-auto mb-3" />
-              <h3 className="text-white font-semibold mb-2">Get Support</h3>
+              <HelpCircle className="w-12 h-12 text-emerald-400 mx-auto mb-3" />
+              <h3 className="text-white font-semibold mb-2">Get Help</h3>
               <p className="text-slate-400 text-sm">
-                Ask questions and get help
+                Ask questions and get support
               </p>
             </CardContent>
           </Card>
         </div>
 
-        {/* Feedback Form */}
-        <Card className="bg-slate-800/50 border-slate-700 shadow-xl">
+        {/* Quick Access Card */}
+        <Card className="bg-slate-800/50 border-slate-700 shadow-xl mb-8">
           <CardHeader>
             <CardTitle className="text-white text-2xl">
-              Send Us Your Feedback
+              Share Your Feedback
             </CardTitle>
             <p className="text-slate-400 text-sm">
-              We read every message and typically respond within 24 hours
+              Help us improve Alchemist AI with your suggestions and ideas
+            </p>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <Button
+              onClick={openFeaturebaseWidget}
+              disabled={!isFeaturebaseReady}
+              className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-6 text-lg shadow-lg hover:shadow-emerald-500/20 transition-all"
+            >
+              <MessageSquare className="w-5 h-5 mr-2" />
+              Open Feedback Widget
+            </Button>
+
+            <div className="flex items-center justify-center gap-4 pt-4">
+              <div className="flex items-center gap-2 text-slate-400 text-sm">
+                <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+                Powered by Featurebase
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Featurebase Embedded Board */}
+        <Card className="bg-slate-800/50 border-slate-700 shadow-xl">
+          <CardHeader>
+            <CardTitle className="text-white text-2xl flex items-center justify-between">
+              <span>Community Feedback Board</span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() =>
+                  window.open("https://aichemist.featurebase.app", "_blank")
+                }
+                className="bg-slate-700 border-slate-600 text-white hover:bg-slate-600"
+              >
+                <ExternalLink className="w-4 h-4 mr-2" />
+                Open in Full Page
+              </Button>
+            </CardTitle>
+            <p className="text-slate-400 text-sm">
+              Browse, vote, and comment on features and suggestions from the
+              community
             </p>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Email Field */}
-              <div>
-                <label
-                  htmlFor="email"
-                  className="block text-sm font-medium text-slate-300 mb-2"
-                >
-                  Your Email Address <span className="text-red-400">*</span>
-                </label>
-                <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  placeholder="your.email@example.com"
-                  className="bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-500 focus:border-emerald-500 focus:ring-emerald-500"
-                  disabled={isSubmitting}
-                  required
-                />
-              </div>
-
-              {/* Subject Field */}
-              <div>
-                <label
-                  htmlFor="subject"
-                  className="block text-sm font-medium text-slate-300 mb-2"
-                >
-                  Subject <span className="text-red-400">*</span>
-                </label>
-                <Input
-                  id="subject"
-                  name="subject"
-                  type="text"
-                  value={formData.subject}
-                  onChange={handleChange}
-                  placeholder="Brief description of your feedback"
-                  className="bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-500 focus:border-emerald-500 focus:ring-emerald-500"
-                  disabled={isSubmitting}
-                  required
-                />
-              </div>
-
-              {/* Message Field */}
-              <div>
-                <label
-                  htmlFor="message"
-                  className="block text-sm font-medium text-slate-300 mb-2"
-                >
-                  Your Message <span className="text-red-400">*</span>
-                </label>
-                <Textarea
-                  id="message"
-                  name="message"
-                  value={formData.message}
-                  onChange={handleChange}
-                  placeholder="Please provide detailed feedback, suggestions, or describe any issues you're experiencing..."
-                  className="bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-500 min-h-[180px] focus:border-emerald-500 focus:ring-emerald-500"
-                  disabled={isSubmitting}
-                  required
-                />
-                <p className="text-xs text-slate-400 mt-2">
-                  The more details you provide, the better we can help you
-                </p>
-              </div>
-
-              {/* Submit Button */}
-              <Button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-6 text-lg shadow-lg hover:shadow-emerald-500/20 transition-all"
-              >
-                {isSubmitting ? (
-                  <>
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-                    Sending Feedback...
-                  </>
-                ) : (
-                  <>
-                    <Send className="w-5 h-5 mr-2" />
-                    Submit Feedback
-                  </>
-                )}
-              </Button>
-            </form>
+            <div className="relative w-full" style={{ height: "600px" }}>
+              <iframe
+                src="https://aichemist.featurebase.app/board"
+                className="w-full h-full rounded-lg border border-slate-700"
+                style={{ border: "none" }}
+                title="Featurebase Feedback Board"
+              />
+            </div>
           </CardContent>
         </Card>
 
         {/* Additional Info */}
-        <div className="mt-8 text-center">
-          <p className="text-slate-400 text-sm">
-            Your feedback will be sent to our team at{" "}
-            <span className="text-emerald-400 font-medium">
-              paulsemz17@gmail.com
-            </span>
-          </p>
+        <div className="mt-8 text-center space-y-4">
+          <div className="bg-slate-800/30 border border-slate-700 rounded-lg p-6">
+            <h3 className="text-white font-semibold mb-2">
+              Why Use Featurebase?
+            </h3>
+            <div className="grid md:grid-cols-2 gap-4 text-sm text-slate-400 mt-4">
+              <div className="flex items-start gap-2">
+                <div className="w-5 h-5 bg-emerald-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <span className="text-white text-xs">✓</span>
+                </div>
+                <span>Vote on features you want most</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <div className="w-5 h-5 bg-emerald-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <span className="text-white text-xs">✓</span>
+                </div>
+                <span>Track progress on your requests</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <div className="w-5 h-5 bg-emerald-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <span className="text-white text-xs">✓</span>
+                </div>
+                <span>Get updates when features ship</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <div className="w-5 h-5 bg-emerald-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <span className="text-white text-xs">✓</span>
+                </div>
+                <span>Join discussions with the community</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
