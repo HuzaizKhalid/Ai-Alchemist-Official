@@ -37,7 +37,7 @@ const Page = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-6 pt-40">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-8">
@@ -48,58 +48,7 @@ const Page = () => {
             <ArrowLeft className="w-4 h-4" />
             Back to Home
           </Link>
-          <h1 className="text-4xl font-bold text-white mb-2">
-            We Value Your Feedback
-          </h1>
-          <p className="text-slate-400">
-            Help us improve Alchemist AI by sharing your thoughts, ideas, and
-            feature requests.
-          </p>
-        </div>
-
-        {/* Main Content */}
-        <div className="grid md:grid-cols-3 gap-6 mb-8">
-          {/* Info Cards */}
-          <Card
-            className="bg-slate-800/50 border-slate-700 hover:border-emerald-500/50 transition-colors cursor-pointer"
-            onClick={openFeaturebaseWidget}
-          >
-            <CardContent className="pt-6 text-center">
-              <Lightbulb className="w-12 h-12 text-emerald-400 mx-auto mb-3" />
-              <h3 className="text-white font-semibold mb-2">
-                Feature Requests
-              </h3>
-              <p className="text-slate-400 text-sm">
-                Suggest new features and vote on ideas
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card
-            className="bg-slate-800/50 border-slate-700 hover:border-emerald-500/50 transition-colors cursor-pointer"
-            onClick={openFeaturebaseWidget}
-          >
-            <CardContent className="pt-6 text-center">
-              <Bug className="w-12 h-12 text-emerald-400 mx-auto mb-3" />
-              <h3 className="text-white font-semibold mb-2">Report Bugs</h3>
-              <p className="text-slate-400 text-sm">
-                Let us know about issues you encounter
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card
-            className="bg-slate-800/50 border-slate-700 hover:border-emerald-500/50 transition-colors cursor-pointer"
-            onClick={openFeaturebaseWidget}
-          >
-            <CardContent className="pt-6 text-center">
-              <HelpCircle className="w-12 h-12 text-emerald-400 mx-auto mb-3" />
-              <h3 className="text-white font-semibold mb-2">Get Help</h3>
-              <p className="text-slate-400 text-sm">
-                Ask questions and get support
-              </p>
-            </CardContent>
-          </Card>
+          <h1 className="text-4xl font-bold text-white mb-2">Feedback</h1>
         </div>
 
         {/* Quick Access Card */}
@@ -156,7 +105,7 @@ const Page = () => {
           <CardContent>
             <div className="relative w-full" style={{ height: "600px" }}>
               <iframe
-                src="https://aichemist.featurebase.app/board"
+                src="https://aichemist.featurebase.app"
                 className="w-full h-full rounded-lg border border-slate-700"
                 style={{ border: "none" }}
                 title="Featurebase Feedback Board"
