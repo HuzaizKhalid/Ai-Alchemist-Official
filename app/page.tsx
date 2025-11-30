@@ -226,16 +226,16 @@ export default function HomePage() {
 
   return (
     <div className="bg-slate-900 text-slate-50">
-      <div className="relative min-h-screen flex flex-col pt-40 ">
+      <div className="relative min-h-screen flex flex-col pt-20 sm:pt-28 md:pt-36 lg:pt-40">
         {/* Green Smoke Effect - Only show when hero section is visible */}
         {!isSearchActive && <GreenSmokeEffect />}
 
         <Spotlight />
 
-        <main className="flex-1 flex flex-col justify-center overflow-y-auto pt-12 relative z-10">
+        <main className="flex-1 flex flex-col justify-center overflow-y-auto pt-6 sm:pt-8 md:pt-12 relative z-10">
           {/* Hero Section - only show when NOT searching */}
           {!isSearchActive && (
-            <div className="w-full max-w-4xl mx-auto px-6 text-center mb-8">
+            <div className="w-full max-w-4xl mx-auto px-2 sm:px-4 md:px-6 text-center mb-8">
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-50 mb-6 leading-tight tracking-tight drop-shadow-md">
                 What do you want to know{" "}
                 <span className="bg-gradient-to-r from-cyan-300 to-violet-400 bg-clip-text text-transparent">
@@ -245,7 +245,7 @@ export default function HomePage() {
               </h1>
 
               <div className="relative max-w-3xl mx-auto rounded-3xl p-[1px] bg-gradient-to-r mb-16 from-cyan-400/20 to-violet-400/20">
-                <div className="rounded-[23px] p-6 backdrop-blur-lg bg-slate-800/80">
+                <div className="rounded-[23px] p-3 sm:p-4 md:p-6 backdrop-blur-lg bg-slate-800/80">
                   <p className="text-base lg:text-lg text-slate-100 leading-relaxed font-normal">
                     Get AI-powered answers while tracking the environmental
                     impact of your queries! Set daily limits and discover the
@@ -262,7 +262,7 @@ export default function HomePage() {
               {searchMode === "followup" ? (
                 <ConversationHistory onNewSearch={handleNewSearch} />
               ) : (
-                <div className="w-full mx-auto px-6 lg:px-8">
+                <div className="w-full mx-auto px-2 sm:px-4 md:px-6 lg:px-8">
                   <div className="backdrop-blur-lg">
                     <SearchResults
                       key={searchResults?.tokenUsage?.totalTokens || 0}
@@ -280,7 +280,7 @@ export default function HomePage() {
         {/* Sticky Search Bar */}
         <div className="sticky bottom-0 bg-slate-900/60 backdrop-blur-md border-t border-slate-700/50">
           <div className="h-px bg-gradient-to-r from-transparent via-slate-600/40 to-transparent" />
-          <div className="max-w-4xl mx-auto p-4 sm:p-6">
+          <div className="max-w-4xl mx-auto px-1 py-2 sm:px-3 sm:py-3 md:px-4 md:py-4 lg:p-6">
             <SearchForm
               query={query}
               setQuery={setQuery}

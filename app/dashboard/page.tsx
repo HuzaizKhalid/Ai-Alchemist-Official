@@ -43,13 +43,13 @@ function GoalSetter({
   icon,
 }: GoalSetterProps) {
   return (
-    <div className="space-y-3">
-      <div className="flex items-center space-x-3">
+    <div className="space-y-2 sm:space-y-3">
+      <div className="flex items-center space-x-2 sm:space-x-3">
         <div className="rounded-full p-1.5 bg-white/6">{icon}</div>
         <label className="font-semibold text-white">{label}</label>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-[1fr_120px] gap-4 items-center">
+      <div className="grid grid-cols-1 sm:grid-cols-[1fr_100px] md:grid-cols-[1fr_120px] gap-3 sm:gap-4 items-center">
         {/* Slider styling uses role selector for shadcn/ui slider */}
         <Slider
           value={[value]}
@@ -69,10 +69,10 @@ function GoalSetter({
             type="number"
             value={value}
             onChange={(e) => setValue(Number(e.target.value))}
-            className="bg-white/12 border border-white/12 text-white placeholder-zinc-300 pl-3 pr-12 h-10 focus:ring-2 focus:ring-emerald-400/25"
+            className="bg-white/12 border border-white/12 text-white placeholder-zinc-300 pl-2 pr-10 sm:pl-3 sm:pr-12 h-10 text-sm focus:ring-2 focus:ring-emerald-400/25"
             aria-label={`${label} input`}
           />
-          <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-zinc-200 bg-white/6 px-2 py-0.5 rounded">
+          <span className="absolute right-1.5 sm:right-2 top-1/2 -translate-y-1/2 text-xs text-zinc-200 bg-white/6 px-1.5 sm:px-2 py-0.5 rounded">
             {unit}
           </span>
         </div>
@@ -98,7 +98,7 @@ function DailyUsageDisplay({
   color,
 }: DailyUsageDisplayProps) {
   return (
-    <div className="space-y-3 p-4 bg-white/5 backdrop-blur-md border border-white/12 rounded-xl shadow-2xl">
+    <div className="space-y-2 sm:space-y-3 p-3 sm:p-4 bg-white/5 backdrop-blur-md border border-white/12 rounded-xl shadow-2xl">
       <div className="flex items-center space-x-3">
         <div className={`rounded-full p-2 ${color}`}>{icon}</div>
         <div>
@@ -107,8 +107,9 @@ function DailyUsageDisplay({
         </div>
       </div>
 
-      <div className="text-2xl font-bold text-white">
-        {value.toFixed(4)} <span className="text-sm text-zinc-300">{unit}</span>
+      <div className="text-xl sm:text-2xl font-bold text-white">
+        {value.toFixed(4)}{" "}
+        <span className="text-xs sm:text-sm text-zinc-300">{unit}</span>
       </div>
     </div>
   );
@@ -153,7 +154,7 @@ function UsageTracker({ label, unit, goal, actual, icon }: UsageTrackerProps) {
   const status = getStatus();
 
   return (
-    <div className="space-y-3 p-4 bg-white/5 backdrop-blur-md border border-white/12 rounded-xl shadow-2xl">
+    <div className="space-y-2 sm:space-y-3 p-3 sm:p-4 bg-white/5 backdrop-blur-md border border-white/12 rounded-xl shadow-2xl">
       <div className="flex items-start justify-between">
         <div className="flex items-center space-x-3">
           <div className="rounded-full p-2 bg-white/6">{icon}</div>
@@ -164,7 +165,7 @@ function UsageTracker({ label, unit, goal, actual, icon }: UsageTrackerProps) {
         </div>
 
         <div
-          className={`px-3 py-1 rounded-full text-xs font-semibold ${status.textColor} ${status.pillBg} border border-white/8`}
+          className={`px-2 sm:px-3 py-1 rounded-full text-xs font-semibold ${status.textColor} ${status.pillBg} border border-white/8`}
         >
           {status.text}
         </div>
@@ -263,11 +264,11 @@ export default function ProfilePage() {
   }
 
   return (
-    <main className="container  mx-auto px-4 sm:px-6 lg:px-8 relative py-12 pt-16 ">
+    <main className="container mx-auto px-2 sm:px-4 md:px-6 lg:px-8 relative py-12 pt-16">
       {/* keep Background component (gradient/dark) */}
       <Background />
 
-      <div className="grid gap-8 relative md:pt-28">
+      <div className="grid gap-4 sm:gap-6 md:gap-8 relative md:pt-28">
         {/* Card: Today's Usage from History */}
         <Card className="bg-white/5 backdrop-blur-xl border border-white/12 text-white shadow-2xl rounded-xl">
           <CardHeader>
@@ -295,7 +296,7 @@ export default function ProfilePage() {
               </div>
             ) : (
               <>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
                   <DailyUsageDisplay
                     label="Water Usage"
                     unit="mL"
@@ -334,7 +335,7 @@ export default function ProfilePage() {
                         </div>
                       </div>
                     </div>
-                    <div className="text-2xl font-bold text-white">
+                    <div className="text-xl sm:text-2xl font-bold text-white">
                       {dailyUsage.totalSearches}
                     </div>
                   </div>
@@ -353,7 +354,7 @@ export default function ProfilePage() {
             </CardTitle>
           </CardHeader>
 
-          <CardContent className="space-y-8">
+          <CardContent className="space-y-4 sm:space-y-6 md:space-y-8">
             <GoalSetter
               label="Water Usage"
               unit="mL"
@@ -403,7 +404,7 @@ export default function ProfilePage() {
             </CardTitle>
           </CardHeader>
 
-          <CardContent className="space-y-6">
+          <CardContent className="space-y-4 sm:space-y-6">
             <UsageTracker
               label="Water"
               unit="mL"
@@ -431,7 +432,7 @@ export default function ProfilePage() {
         </Card>
 
         {/* History List */}
-        <div className="bg-white/5 backdrop-blur-xl border border-white/12 text-white shadow-2xl rounded-xl p-6">
+        <div className="bg-white/5 backdrop-blur-xl border border-white/12 text-white shadow-2xl rounded-xl p-3 sm:p-4 md:p-6">
           <HistoryList
             isLoading={false}
             onNewSearch={() => {

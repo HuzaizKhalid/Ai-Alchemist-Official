@@ -153,27 +153,31 @@ const CustomChatWidget: React.FC<CustomChatWidgetProps> = ({
       {/* Chat Window - Responsive positioning */}
       {isOpen && (
         <div
-          className="fixed z-50 w-96 h-[32rem] bg-gray-900/95 backdrop-blur-xl 
-                        rounded-2xl shadow-2xl border border-gray-700/50 overflow-hidden
-                        max-h-[90vh]
-                        /* Mobile: Position below top-left icon */
-                        top-36 left-6
+          className="fixed z-50 bg-gray-900/95 backdrop-blur-xl 
+                        rounded-2xl shadow-2xl border border-gray-700/50 
+                        flex flex-col
+                        /* Mobile: Better left-aligned positioning */
+                        top-4 left-2 right-2 bottom-4 w-auto h-auto
                         /* Desktop: Traditional positioning */
-                        sm:bottom-20 sm:right-6 sm:left-auto sm:top-auto sm:w-80 sm:h-[28rem]"
+                        sm:bottom-20 sm:right-6 sm:left-auto sm:top-auto sm:w-96 sm:h-[32rem] sm:max-w-none"
         >
           {/* Header */}
-          <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-4 flex justify-between items-center">
-            <div className="flex items-center space-x-3">
+          <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-3 sm:p-4 flex justify-between items-center flex-shrink-0">
+            <div className="flex items-center space-x-2 sm:space-x-3 min-w-0">
               <Image
                 src="/live-chat_9165147.png"
                 alt="Support"
-                width={24}
-                height={24}
-                className="w-6 h-6 object-contain filter brightness-0 invert"
+                width={20}
+                height={20}
+                className="w-5 h-5 sm:w-6 sm:h-6 object-contain filter brightness-0 invert flex-shrink-0"
               />
-              <div>
-                <h3 className="text-white font-semibold">{siteName} Support</h3>
-                <p className="text-blue-100 text-xs">We're here to help!</p>
+              <div className="min-w-0">
+                <h3 className="text-white font-semibold text-sm sm:text-base truncate">
+                  {siteName} Support
+                </h3>
+                <p className="text-blue-100 text-xs hidden sm:block">
+                  We're here to help!
+                </p>
               </div>
             </div>
             <button
@@ -188,12 +192,12 @@ const CustomChatWidget: React.FC<CustomChatWidgetProps> = ({
           </div>
 
           {/* Chat Content */}
-          <div className="flex flex-col h-full">
+          <div className="flex flex-col flex-1 overflow-hidden">
             {!showForm && !showSuccess && (
               /* Welcome Screen */
-              <div className="p-6 flex-1 flex flex-col justify-center items-center space-y-6">
-                <div className="text-center">
-                  <h4 className="text-white text-lg font-medium mb-2">
+              <div className="p-3 sm:p-6 flex-1 flex flex-col justify-center items-center space-y-4 sm:space-y-6">
+                <div className="text-center px-1">
+                  <h4 className="text-white text-base sm:text-lg font-medium mb-2">
                     👋 Hi! How can we help?
                   </h4>
                   <p className="text-gray-400 text-sm">
@@ -214,11 +218,14 @@ const CustomChatWidget: React.FC<CustomChatWidgetProps> = ({
 
             {showForm && (
               /* Contact Form */
-              <div className="flex flex-col h-full">
-                <div className="p-4 flex-1 overflow-y-auto">
-                  <form onSubmit={handleSubmit} className="space-y-4">
+              <form
+                onSubmit={handleSubmit}
+                className="flex flex-col flex-1 overflow-hidden"
+              >
+                <div className="px-2 py-3 sm:p-4 flex-1 overflow-y-auto">
+                  <div className="space-y-3 sm:space-y-4">
                     <div>
-                      <label className="block text-gray-300 text-sm font-medium mb-1">
+                      <label className="block text-gray-300 text-xs sm:text-sm font-medium mb-1">
                         Your Name *
                       </label>
                       <input
@@ -235,7 +242,7 @@ const CustomChatWidget: React.FC<CustomChatWidgetProps> = ({
                     </div>
 
                     <div>
-                      <label className="block text-gray-300 text-sm font-medium mb-1">
+                      <label className="block text-gray-300 text-xs sm:text-sm font-medium mb-1">
                         Email Address *
                       </label>
                       <input
@@ -252,7 +259,7 @@ const CustomChatWidget: React.FC<CustomChatWidgetProps> = ({
                     </div>
 
                     <div>
-                      <label className="block text-gray-300 text-sm font-medium mb-1">
+                      <label className="block text-gray-300 text-xs sm:text-sm font-medium mb-1">
                         Subject *
                       </label>
                       <input
@@ -269,7 +276,7 @@ const CustomChatWidget: React.FC<CustomChatWidgetProps> = ({
                     </div>
 
                     <div>
-                      <label className="block text-gray-300 text-sm font-medium mb-1">
+                      <label className="block text-gray-300 text-xs sm:text-sm font-medium mb-1">
                         Your Message *
                       </label>
                       <textarea
@@ -277,19 +284,19 @@ const CustomChatWidget: React.FC<CustomChatWidgetProps> = ({
                         value={formData.message}
                         onChange={handleInputChange}
                         required
-                        rows={3}
+                        rows={4}
                         className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg 
                                  text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none
                                  transition-colors text-sm resize-none"
                         placeholder="Tell us how we can help..."
                       />
                     </div>
-                  </form>
+                  </div>
                 </div>
 
                 {/* Fixed Button Area */}
-                <div className="p-4 border-t border-gray-700/50 bg-gray-900/95">
-                  <div className="flex space-x-3">
+                <div className="p-3 sm:p-4 border-t border-gray-700/50 bg-gray-900/95 flex-shrink-0">
+                  <div className="flex space-x-2 sm:space-x-3">
                     <button
                       type="button"
                       onClick={() => setShowForm(false)}
@@ -301,7 +308,6 @@ const CustomChatWidget: React.FC<CustomChatWidgetProps> = ({
                     <button
                       type="submit"
                       disabled={isLoading}
-                      onClick={handleSubmit}
                       className="flex-1 px-4 py-3 bg-gradient-to-r from-blue-500 to-purple-600 
                                hover:from-blue-600 hover:to-purple-700 text-white rounded-lg
                                transition-all text-sm font-medium disabled:opacity-50 flex items-center justify-center"
@@ -317,13 +323,13 @@ const CustomChatWidget: React.FC<CustomChatWidgetProps> = ({
                     </button>
                   </div>
                 </div>
-              </div>
+              </form>
             )}
 
             {showSuccess && (
               /* Success Screen */
-              <div className="p-6 flex-1 flex flex-col justify-center items-center space-y-4">
-                <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center">
+              <div className="p-3 sm:p-6 flex-1 flex flex-col justify-center items-center space-y-4">
+                <div className="w-12 h-12 sm:w-16 sm:h-16 bg-green-500 rounded-full flex items-center justify-center">
                   <svg
                     className="w-8 h-8 text-white"
                     fill="none"
@@ -338,8 +344,8 @@ const CustomChatWidget: React.FC<CustomChatWidgetProps> = ({
                     />
                   </svg>
                 </div>
-                <div className="text-center">
-                  <h4 className="text-white text-lg font-medium mb-2">
+                <div className="text-center px-2 sm:px-4">
+                  <h4 className="text-white text-base sm:text-lg font-medium mb-2">
                     ✅ Message Sent Successfully!
                   </h4>
                   <p className="text-gray-400 text-sm">

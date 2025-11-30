@@ -326,7 +326,7 @@ export function SearchResults({ results, isHome = false }: SearchResultsProps) {
   return (
     // Main container with better height management
     <div className="w-full min-h-0 flex-1 overflow-y-auto">
-      <div className="container max-w-7xl mx-auto px-4 lg:px-6 py-6">
+      <div className="container max-w-7xl mx-auto px-1 sm:px-2 md:px-4 lg:px-6 py-3 sm:py-4 md:py-6">
         {isHome && (
           <div>
             <Button
@@ -340,15 +340,15 @@ export function SearchResults({ results, isHome = false }: SearchResultsProps) {
           </div>
         )}
 
-        <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 lg:gap-8">
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-3 sm:gap-4 md:gap-6 lg:gap-8">
           {/* Left Column: Conversation thread & Comparison Card */}
-          <div className="xl:col-span-5 space-y-6">
+          <div className="xl:col-span-5 space-y-3 sm:space-y-4 md:space-y-6">
             {/* User Message */}
-            <div className="flex items-start gap-3 lg:gap-4">
+            <div className="flex items-start gap-2 sm:gap-3 lg:gap-4">
               <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center flex-shrink-0">
                 <User className="w-4 h-4 lg:w-5 lg:h-5 text-white" />
               </div>
-              <div className="flex-1 min-w-0 bg-slate-800/50 border border-slate-700 rounded-xl p-3 lg:p-4">
+              <div className="flex-1 min-w-0 bg-slate-800/50 border border-slate-700 rounded-xl p-2 sm:p-3 lg:p-4">
                 <p className="text-white/90 leading-relaxed text-sm lg:text-base break-words">
                   {query}
                 </p>
@@ -356,12 +356,12 @@ export function SearchResults({ results, isHome = false }: SearchResultsProps) {
             </div>
 
             {/* Bot Response */}
-            <div className="flex items-start gap-3 lg:gap-4">
+            <div className="flex items-start gap-2 sm:gap-3 lg:gap-4">
               <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-full bg-gradient-to-r from-emerald-500 to-blue-500 flex items-center justify-center flex-shrink-0">
                 <Bot className="w-4 h-4 lg:w-5 lg:h-5 text-white" />
               </div>
-              <div className="flex-1 min-w-0 bg-slate-800/30 border border-slate-700/80 rounded-xl p-3 lg:p-4">
-                <div className="prose prose-sm lg:prose prose-invert max-w-none text-white/80">
+              <div className="flex-1 min-w-0 bg-slate-800/30 border border-slate-700/80 rounded-xl p-2 sm:p-3 lg:p-4 overflow-hidden">
+                <div className="prose prose-sm lg:prose prose-invert max-w-none text-white/80 break-words overflow-wrap-anywhere">
                   <ReactMarkdown>{response}</ReactMarkdown>
                 </div>
               </div>
@@ -385,7 +385,7 @@ export function SearchResults({ results, isHome = false }: SearchResultsProps) {
           </div>
 
           {/* Right Column: Data Visualizations */}
-          <div className="xl:col-span-7 space-y-6">
+          <div className="xl:col-span-7 space-y-3 sm:space-y-4 md:space-y-6">
             {/* Token Usage Chart */}
             {tokenUsage && (
               <Card className="bg-slate-800/50 border border-slate-700 shadow-xl">
@@ -449,7 +449,7 @@ export function SearchResults({ results, isHome = false }: SearchResultsProps) {
             )}
 
             {/* Environmental Impact Bar Charts */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3 md:gap-4 lg:gap-6">
               <ImpactBarChart
                 icon={<Zap className="w-4 h-4 lg:w-5 lg:h-5 text-yellow-400" />}
                 title="Energy Usage"
@@ -484,7 +484,7 @@ export function SearchResults({ results, isHome = false }: SearchResultsProps) {
             <ClimateWidget carbonEmissions={environmental.carbonEmissions} />
 
             {/* Daily Stats Section */}
-            <section className="bg-gray-900 text-white py-8 lg:py-12 px-4 lg:px-6 text-center rounded-xl">
+            <section className="bg-gray-900 text-white py-4 sm:py-6 md:py-8 lg:py-12 px-2 sm:px-3 md:px-4 lg:px-6 text-center rounded-xl">
               <h2 className="text-xl lg:text-3xl font-bold mb-4">
                 Daily prompts as of{" "}
                 {currentTime.toLocaleDateString("en-US", {
@@ -501,7 +501,7 @@ export function SearchResults({ results, isHome = false }: SearchResultsProps) {
                 })}
               </h2>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 lg:gap-8 max-w-2xl mx-auto">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 md:gap-6 lg:gap-8 max-w-2xl mx-auto">
                 <div>
                   <h3 className="text-2xl lg:text-4xl font-bold text-blue-400">
                     {dailyPrompts !== null
@@ -542,15 +542,14 @@ export function SearchResults({ results, isHome = false }: SearchResultsProps) {
         </div>
 
         {/* Share Button - Bottom Center of Main Container */}
-        <div className="mt-8 flex justify-center">
+        <div className="mt-4 sm:mt-6 md:mt-8 flex flex-col sm:flex-row justify-center gap-2 sm:gap-3">
           {shareUrl ? (
-            <div className="flex items-center gap-3 bg-slate-800/30 border border-slate-700 rounded-lg p-3">
+            <div className="flex flex-col sm:flex-row items-center gap-3 bg-slate-800/30 border border-slate-700 rounded-lg p-2 sm:p-3 w-full max-w-md">
               <input
                 type="text"
                 value={shareUrl}
                 readOnly
-                className="bg-slate-900/50 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white/90 min-w-0"
-                style={{ width: 280 }}
+                className="bg-slate-900/50 border border-slate-600 rounded-lg px-2 sm:px-3 py-2 text-xs sm:text-sm text-white/90 min-w-0 w-full sm:w-auto flex-1"
               />
               <Button
                 onClick={copyToClipboard}

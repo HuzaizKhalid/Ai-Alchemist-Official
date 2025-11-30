@@ -127,13 +127,13 @@ const CustomChatWidget: React.FC<CustomChatWidgetProps> = ({
 
   if (!isOpen) {
     return (
-      <div className="fixed bottom-6 right-6 z-50">
+      <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50">
         <button
           onClick={() => setIsOpen(true)}
-          className="bg-gradient-to-r from-cyan-500 to-violet-500 text-white p-4 rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 group"
+          className="bg-gradient-to-r from-cyan-500 to-violet-500 text-white p-3 sm:p-4 rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 group"
           aria-label="Open chat"
         >
-          <MessageCircle className="w-6 h-6 group-hover:animate-pulse" />
+          <MessageCircle className="w-5 h-5 sm:w-6 sm:h-6 group-hover:animate-pulse" />
           {/* Notification dot */}
           <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
         </button>
@@ -142,18 +142,22 @@ const CustomChatWidget: React.FC<CustomChatWidgetProps> = ({
   }
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 w-80 h-96 bg-slate-900/95 backdrop-blur-lg border border-slate-700/50 rounded-xl shadow-2xl flex flex-col overflow-hidden">
+    <div className="fixed z-50 bg-slate-900/95 backdrop-blur-lg border border-slate-700/50 rounded-xl shadow-2xl flex flex-col overflow-hidden
+                    /* Mobile: Better left-aligned with minimal right margin */
+                    top-4 left-2 right-2 bottom-4
+                    /* Desktop: Traditional chat window */
+                    sm:bottom-6 sm:right-6 sm:left-auto sm:top-auto sm:w-96 sm:h-[32rem]">
       {/* Header */}
-      <div className="bg-gradient-to-r from-cyan-600 to-violet-600 p-4 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+      <div className="bg-gradient-to-r from-cyan-600 to-violet-600 p-3 sm:p-4 flex items-center justify-between flex-shrink-0">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+          <div className="w-7 h-7 sm:w-8 sm:h-8 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
             <Bot className="w-5 h-5 text-white" />
           </div>
-          <div>
-            <h3 className="font-semibold text-white text-sm">
+          <div className="min-w-0">
+            <h3 className="font-semibold text-white text-sm sm:text-base truncate">
               {siteName} Support
             </h3>
-            <p className="text-xs text-cyan-100">Typically replies instantly</p>
+            <p className="text-xs text-cyan-100 hidden sm:block">Typically replies instantly</p>
           </div>
         </div>
         <button
@@ -166,12 +170,12 @@ const CustomChatWidget: React.FC<CustomChatWidgetProps> = ({
 
       {!isEmailSet ? (
         /* Email Collection Form */
-        <div className="flex-1 p-4 flex flex-col justify-center">
-          <div className="text-center mb-4">
-            <h4 className="text-slate-200 font-medium mb-2">
+        <div className="flex-1 px-2 py-3 sm:p-4 flex flex-col justify-center overflow-y-auto">
+          <div className="text-center mb-4 px-1 sm:px-2">
+            <h4 className="text-slate-200 font-medium mb-2 text-sm sm:text-base">
               Start a conversation
             </h4>
-            <p className="text-slate-400 text-sm">
+            <p className="text-slate-400 text-xs sm:text-sm">
               We'll send our replies to your email
             </p>
           </div>
@@ -181,7 +185,7 @@ const CustomChatWidget: React.FC<CustomChatWidgetProps> = ({
               placeholder="Your name"
               value={userName}
               onChange={(e) => setUserName(e.target.value)}
-              className="w-full p-2 bg-slate-800 border border-slate-600 rounded-lg text-slate-200 placeholder-slate-400 focus:border-cyan-400 focus:outline-none text-sm"
+              className="w-full p-2 bg-slate-800 border border-slate-600 rounded-lg text-slate-200 placeholder-slate-400 focus:border-cyan-400 focus:outline-none text-xs sm:text-sm"
               required
             />
             <input
@@ -189,12 +193,12 @@ const CustomChatWidget: React.FC<CustomChatWidgetProps> = ({
               placeholder="Your email"
               value={userEmail}
               onChange={(e) => setUserEmail(e.target.value)}
-              className="w-full p-2 bg-slate-800 border border-slate-600 rounded-lg text-slate-200 placeholder-slate-400 focus:border-cyan-400 focus:outline-none text-sm"
+              className="w-full p-2 bg-slate-800 border border-slate-600 rounded-lg text-slate-200 placeholder-slate-400 focus:border-cyan-400 focus:outline-none text-xs sm:text-sm"
               required
             />
             <button
               type="submit"
-              className="w-full bg-gradient-to-r from-cyan-500 to-violet-500 text-white p-2 rounded-lg font-medium hover:shadow-lg transition-all text-sm"
+              className="w-full bg-gradient-to-r from-cyan-500 to-violet-500 text-white p-2 rounded-lg font-medium hover:shadow-lg transition-all text-xs sm:text-sm"
             >
               Start Chat
             </button>
@@ -204,7 +208,7 @@ const CustomChatWidget: React.FC<CustomChatWidgetProps> = ({
         /* Chat Interface */
         <>
           {/* Messages */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-3">
+          <div className="flex-1 overflow-y-auto px-2 py-3 sm:p-4 space-y-3">
             {messages.map((message) => (
               <div
                 key={message.id}
@@ -215,7 +219,7 @@ const CustomChatWidget: React.FC<CustomChatWidgetProps> = ({
               >
                 <div
                   className={cn(
-                    "max-w-[80%] p-3 rounded-lg text-sm",
+                    "max-w-[90%] sm:max-w-[80%] p-2.5 sm:p-3 rounded-lg text-xs sm:text-sm break-words",
                     message.sender === "user"
                       ? "bg-gradient-to-r from-cyan-500 to-violet-500 text-white rounded-br-sm"
                       : "bg-slate-700 text-slate-200 rounded-bl-sm"
@@ -239,7 +243,7 @@ const CustomChatWidget: React.FC<CustomChatWidgetProps> = ({
           </div>
 
           {/* Input */}
-          <div className="p-4 border-t border-slate-700/50">
+          <div className="p-3 sm:p-4 border-t border-slate-700/50 flex-shrink-0">
             <div className="flex gap-2">
               <input
                 type="text"
@@ -249,13 +253,13 @@ const CustomChatWidget: React.FC<CustomChatWidgetProps> = ({
                   e.key === "Enter" && !isLoading && handleSendMessage()
                 }
                 placeholder="Type your message..."
-                className="flex-1 p-2 bg-slate-800 border border-slate-600 rounded-lg text-slate-200 placeholder-slate-400 focus:border-cyan-400 focus:outline-none text-sm"
+                className="flex-1 p-2 bg-slate-800 border border-slate-600 rounded-lg text-slate-200 placeholder-slate-400 focus:border-cyan-400 focus:outline-none text-xs sm:text-sm"
                 disabled={isLoading}
               />
               <button
                 onClick={handleSendMessage}
                 disabled={isLoading || !currentMessage.trim()}
-                className="p-2 bg-gradient-to-r from-cyan-500 to-violet-500 text-white rounded-lg hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="p-2 bg-gradient-to-r from-cyan-500 to-violet-500 text-white rounded-lg hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
               >
                 <Send className="w-4 h-4" />
               </button>
