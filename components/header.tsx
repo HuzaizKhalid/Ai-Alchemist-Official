@@ -230,11 +230,11 @@ export function Header() {
         }`}
       >
         {/* Glassmorphism sidebar */}
-        <div className="h-full backdrop-blur-3xl bg-white/10 border-l border-white/20 shadow-2xl">
+        <div className="h-full backdrop-blur-3xl bg-white/10 border-l border-white/20 shadow-2xl overflow-y-auto">
           {/* Subtle gradient overlay */}
-          <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-slate-900/20"></div>
+          <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-slate-900/20 pointer-events-none"></div>
 
-          <div className="relative flex flex-col h-full">
+          <div className="relative flex flex-col min-h-full">
             {/* Menu Header */}
             <div className="flex items-center justify-between p-6 border-b border-white/20 bg-black/5">
               <h2 className="text-xl font-semibold text-white drop-shadow-sm">
@@ -251,7 +251,7 @@ export function Header() {
             </div>
 
             {/* Navigation Links */}
-            <nav className="flex-1 p-4 space-y-3">
+            <nav className="flex-1 p-4 space-y-3 overflow-y-auto">
               <NavLink href="/">
                 <Home className="w-5 h-5 text-emerald-400 drop-shadow-sm" />
                 <span className="drop-shadow-sm">Home</span>
@@ -299,9 +299,13 @@ export function Header() {
                 )}
               </div>
 
-              <NavLink href="/vote">
+              <NavLink href="/gallery">
+                <LayoutDashboard className="w-5 h-5 text-emerald-400 drop-shadow-sm" />
+                <span className="drop-shadow-sm">Gallery</span>
+              </NavLink>
+              <NavLink href="/enterprise">
                 <DollarSign className="w-5 h-5 text-emerald-400 drop-shadow-sm" />
-                <span className="drop-shadow-sm">Vote</span>
+                <span className="drop-shadow-sm">Enterprise</span>
               </NavLink>
               <NavLink href="/feedback">
                 <Contact className="w-5 h-5 text-emerald-400 drop-shadow-sm" />
