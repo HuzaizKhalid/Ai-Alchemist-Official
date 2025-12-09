@@ -506,7 +506,7 @@ const SearchForm = ({
         }`}
       >
         <form onSubmit={handleSearch}>
-          <div className="relative">
+          <div className="relative z-10">
             <TextareaAutosize
               ref={inputRef}
               value={query}
@@ -519,15 +519,22 @@ const SearchForm = ({
                   ? "Ask a follow-up question based on your conversation history..."
                   : `What do you want to know? (${selectedTypeData.label.toLowerCase()} search)`
               }
-              className={`w-full max-h-48 resize-none bg-transparent py-4 pl-6 pr-20 text-lg text-white placeholder:text-slate-400 focus:outline-none transition-all duration-300 ${
+              className={`relative z-20 w-full max-h-48 resize-none bg-transparent py-4 pl-6 pr-20 text-base sm:text-lg text-white caret-white placeholder:text-slate-400 focus:outline-none transition-all duration-300 [-webkit-text-fill-color:white] [-webkit-font-smoothing:antialiased] [text-rendering:optimizeLegibility] [&::-webkit-input-placeholder]:[-webkit-text-fill-color:rgb(148_163_184)] ${
                 isFocused ? "placeholder:text-slate-500" : ""
               }`}
+              style={{
+                WebkitTextFillColor: 'white',
+                color: 'white',
+                opacity: 1,
+                textShadow: 'none',
+                fontWeight: 400
+              }}
               minRows={1}
               maxRows={6}
             />
 
             {/* Enhanced floating action area */}
-            <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center space-x-3">
+            <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center space-x-3 z-30">
               {/* Keyboard shortcut hint - more prominent when focused */}
               <div
                 className={`hidden md:flex items-center text-xs transition-all duration-300 ${
