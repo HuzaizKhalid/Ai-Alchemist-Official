@@ -379,9 +379,6 @@ export function SearchResults({ results, isHome = false }: SearchResultsProps) {
               query={query}
               isLoading={imagesLoading}
             />
-
-            {/* Endangered Animals Card */}
-            <EndangeredAnimals />
           </div>
 
           {/* Right Column: Data Visualizations */}
@@ -479,6 +476,9 @@ export function SearchResults({ results, isHome = false }: SearchResultsProps) {
                 color="#3b82f6"
               />
             </div>
+
+            {/* Endangered Animals Card */}
+            <EndangeredAnimals />
 
             {/* Climate Widget */}
             <ClimateWidget carbonEmissions={environmental.carbonEmissions} />

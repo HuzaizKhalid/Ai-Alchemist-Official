@@ -206,7 +206,16 @@ const CustomChatWidget: React.FC<CustomChatWidgetProps> = ({
                 </div>
 
                 <button
-                  onClick={() => setShowForm(true)}
+                  onClick={() => {
+                    setShowForm(true);
+                    // Close the announcement bar on mobile
+                    const announcementCloseBtn = document.querySelector(
+                      '[class*="from-emerald-600"] button[class*="rounded-full"]'
+                    ) as HTMLButtonElement;
+                    if (announcementCloseBtn && window.innerWidth < 768) {
+                      announcementCloseBtn.click();
+                    }
+                  }}
                   className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700
                            text-white px-6 py-3 rounded-lg transition-all duration-200 transform hover:scale-105
                            shadow-lg hover:shadow-xl"
